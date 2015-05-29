@@ -1,16 +1,16 @@
 # ElevatorKata01
 elevator kata - first attempt (see http://blog.milesburton.com/2013/03/28/elevator-kata-mind-bending-pairing-exercise/)
 
-an elevator responds to calls containing a source floor and direction
-an elevator delivers passengers to requested floors
-elevator calls are queued not necessarily FIFO
-you may validate passenger floor requests
-you may implement current floor monitor
-you may implement direction arrow
-you may implement doors (opening and closing)
-you may implement DING!
-there can be more than one elevator
-?? Max number of lift occupants?
+- An elevator responds to calls containing a source floor and direction
+- An elevator delivers passengers to requested floors
+- Elevator calls are queued not necessarily FIFO
+- You may validate passenger floor requests
+- you may implement current floor monitor
+- you may implement direction arrow
+- you may implement doors (opening and closing)
+- you may implement DING!
+- there can be more than one elevator
+- ?? Max number of lift occupants?
 
 Interesting links:
 http://www.quora.com/Is-there-any-public-elevator-scheduling-algorithm-standard
