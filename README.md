@@ -13,7 +13,10 @@ elevator kata - first attempt (see http://blog.milesburton.com/2013/03/28/elevat
 - ?? Max number of lift occupants?
 
 Related links:
+
 http://www.quora.com/Is-there-any-public-elevator-scheduling-algorithm-standard
+
 http://www.quora.com/Why-are-virtually-all-elevator-algorithms-so-inefficient
+
 Paternoster: https://www.youtube.com/watch?v=Ro3Fc_yG3p0
 
