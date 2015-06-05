@@ -11,14 +11,13 @@
 
         public Floor Call(Floor source)
         {
-            _currentFloor = source;
-
-            return _currentFloor;
+            return Move(source);
         }
 
         public Floor Move(Floor destination)
         {
             _currentFloor = destination;
+
             return _currentFloor;
         }
     }

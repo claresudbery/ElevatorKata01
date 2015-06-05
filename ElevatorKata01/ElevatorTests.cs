@@ -6,7 +6,7 @@ namespace ElevatorKata01
     public class ElevatorTests
     {
         [Test]
-        public void WhenICallLiftToGroundFloorThenLiftGoesToGroundFloor()
+        public void GivenIAmOnGroundFloorWhenICallLiftToFirstFloorThenLiftGoesToFirstFloor()
         {
             // Arrange
             var theLift = new Lift(Floor.Ground);
@@ -19,7 +19,7 @@ namespace ElevatorKata01
         }
 
         [Test]
-        public void WhenIAmOnGroundFloorAndIRequestTravelToTheFirstFloorThenLiftTakesMeToTheFirstFloor()
+        public void GivenIAmOnGroundFloorWhenIRequestTravelToTheFirstFloorThenLiftTakesMeToTheFirstFloor()
         {
             // Arrange
             var theLift = new Lift(Floor.Ground);
