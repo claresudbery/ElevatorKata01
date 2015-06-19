@@ -1,8 +1,10 @@
 ﻿namespace ElevatorKata01
 {
-    internal enum Floor
+    public enum Floor
     {
         Ground,
-        First
+        First,
+        Second,
+        Third
     }
 }

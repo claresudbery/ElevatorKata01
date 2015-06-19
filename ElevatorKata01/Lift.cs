@@ -1,6 +1,6 @@
 ﻿namespace ElevatorKata01
 {
-    internal class Lift
+    public class Lift
     {
         private Floor _currentFloor;
 
