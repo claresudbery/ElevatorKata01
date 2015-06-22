@@ -53,10 +53,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Call.cs" />
+    <Compile Include="ILiftMonitor.cs" />
+    <Compile Include="LiftSpares.cs" />
+    <Compile Include="LiftStatus.cs" />
     <Compile Include="Direction.cs" />
     <Compile Include="ElevatorTests.cs" />
     <Compile Include="Floor.cs" />
-    <Compile Include="ILiftMonitor.cs" />
     <Compile Include="Lift.cs" />
     <Compile Include="LiftMonitor.cs" />
     <Compile Include="ObservableLift.cs" />

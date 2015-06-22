@@ -4,7 +4,7 @@ namespace ElevatorKata01
 {
     public class LiftMonitor : ILiftMonitor
     {
-        public void OnNext(Floor value)
+        public void OnNext(LiftStatus value)
         {
             throw new NotImplementedException();
         }

@@ -2,7 +2,7 @@
 
 namespace ElevatorKata01
 {
-    public interface ILiftMonitor : IObserver<Floor>
+    public interface ILiftMonitor : IObserver<LiftStatus>
     {
     }
 }
