@@ -52,6 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Call.cs" />
+    <Compile Include="Direction.cs" />
     <Compile Include="ElevatorTests.cs" />
     <Compile Include="Floor.cs" />
     <Compile Include="ILiftMonitor.cs" />
