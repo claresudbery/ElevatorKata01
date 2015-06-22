@@ -60,10 +60,11 @@ namespace ElevatorKata01
 
             // Act
             theLift.Move(FirstFloor);
-            Thread.Sleep(1050);
 
             // Assert
             Assert.That(_liftStatuses.Count, Is.GreaterThan(0));
+            Assert.That(_liftStatuses[_liftStatuses.Count - 1].CurrentFloor, Is.EqualTo(GroundFloor));
+            Thread.Sleep(2050);
             Assert.That(_liftStatuses[_liftStatuses.Count - 1].CurrentFloor, Is.EqualTo(FirstFloor));
         }
 
@@ -117,11 +118,6 @@ namespace ElevatorKata01
         //    // Clean up
         //    theLift.Dispose();
         //}
-
-        public void OnNext(Floor currentFloor)
-        {
-            _floorsVisited.Add(currentFloor);
-        }
 
         public void OnNext(LiftStatus currentLiftStatus)
         {
