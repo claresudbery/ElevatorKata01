@@ -158,7 +158,7 @@ namespace ElevatorKata01
                         i => i < LastUpFloor,
                         i => i + 1, // iterator
                         i => i + 1, // actual value? Shouldn't use same val as iterator?
-                        i => TimeSpan.FromSeconds(1)
+                        i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval)
                     );
 
                 _currentDirection = Direction.Up;

@@ -52,6 +52,11 @@ namespace ElevatorKata01
             }
         }
 
+        public void Call(int destinationFloor)
+        {
+            Move(destinationFloor);
+        }
+
         private void MoveUpwards()
         {
             _liftEngine = Observable.Generate
@@ -60,7 +65,7 @@ namespace ElevatorKata01
                     i => i < LastUpFloor,
                     i => i + 1, // iterator
                     i => i + 1, // actual value? Shouldn't use same val as iterator?
-                    i => TimeSpan.FromSeconds(1)
+                    i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval)
                 );
 
             _currentDirection = Direction.Up;
@@ -81,7 +86,7 @@ namespace ElevatorKata01
                     i => i > LastDownFloor,
                     i => i - 1, // iterator
                     i => i - 1, // actual value? Shouldn't use same val as iterator?
-                    i => TimeSpan.FromSeconds(1)
+                    i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval)
                 );
 
             _currentDirection = Direction.Down;
