@@ -20,7 +20,7 @@ namespace ElevatorKata01
         private const int SixthFloor = 6;
 
         [Test]
-        public void When_person_in_lift_enters_a_higher_floor_number_then_lift_starts_moving_upwards()
+        public void Test01_When_person_in_lift_enters_a_higher_floor_number_then_lift_starts_moving_upwards()
         {
             // Arrange
             var theLift = new ObservableLift(GroundFloor);
@@ -37,7 +37,7 @@ namespace ElevatorKata01
         }
 
         [Test]
-        public void When_person_in_lift_enters_a_lower_floor_number_then_lift_starts_moving_downwards()
+        public void Test02_When_person_in_lift_enters_a_lower_floor_number_then_lift_starts_moving_downwards()
         {
             // Arrange
             var theLift = new ObservableLift(FirstFloor);
@@ -54,7 +54,7 @@ namespace ElevatorKata01
         }
 
         [Test]
-        public void When_person_in_lift_enters_a_floor_number_then_lift_notifies_its_current_location()
+        public void Test03_When_person_in_lift_enters_a_floor_number_then_lift_notifies_its_current_location()
         {
             // Arrange
             var theLift = new ObservableLift(GroundFloor);
@@ -70,7 +70,7 @@ namespace ElevatorKata01
         }
 
         [Test]
-        public void When_person_in_lift_enters_a_floor_number_then_lift_arrives_at_next_floor_after_one_second()
+        public void Test04_When_person_in_lift_enters_a_floor_number_then_lift_arrives_at_next_floor_after_one_second()
         {
             // Arrange
             var theLift = new ObservableLift(GroundFloor);
@@ -87,7 +87,7 @@ namespace ElevatorKata01
         }
 
         [Test]
-        public void When_lift_arrives_at_new_floor_after_person_in_lift_makes_request_then_lift_stops_moving()
+        public void Test05_When_lift_arrives_at_new_floor_after_person_in_lift_makes_request_then_lift_stops_moving()
         {
             // Arrange
             var theLift = new ObservableLift(GroundFloor);
@@ -104,7 +104,7 @@ namespace ElevatorKata01
         }
 
         [Test]
-        public void When_person_calls_lift_to_higher_floor_then_lift_starts_moving_upwards()
+        public void Test06_When_person_calls_lift_to_higher_floor_then_lift_starts_moving_upwards()
         {
             // Arrange
             var theLift = new ObservableLift(GroundFloor);
@@ -121,7 +121,7 @@ namespace ElevatorKata01
         }
 
         [Test]
-        public void When_person_calls_lift_to_lower_floor_then_lift_starts_moving_downwards()
+        public void Test07_When_person_calls_lift_to_lower_floor_then_lift_starts_moving_downwards()
         {
             // Arrange
             var theLift = new ObservableLift(FirstFloor);
@@ -138,7 +138,7 @@ namespace ElevatorKata01
         }
 
         [Test]
-        public void When_person_calls_lift_then_lift_notifies_its_current_location()
+        public void Test08_When_person_calls_lift_then_lift_notifies_its_current_location()
         {
             // Arrange
             var theLift = new ObservableLift(GroundFloor);
@@ -154,7 +154,7 @@ namespace ElevatorKata01
         }
 
         [Test]
-        public void When_person_calls_lift_to_new_floor_then_lift_arrives_at_next_floor_after_floor_interval()
+        public void Test09_When_person_calls_lift_to_new_floor_then_lift_arrives_at_next_floor_after_floor_interval()
         {
             // Arrange
             var theLift = new ObservableLift(GroundFloor);
@@ -171,7 +171,7 @@ namespace ElevatorKata01
         }
 
         [Test]
-        public void When_lift_arrives_at_new_floor_after_person_outside_lift_calls_it_then_lift_stops_moving()
+        public void Test10_When_lift_arrives_at_new_floor_after_person_outside_lift_calls_it_then_lift_stops_moving()
         {
             // Arrange
             var theLift = new ObservableLift(GroundFloor);

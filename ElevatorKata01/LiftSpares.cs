@@ -9,7 +9,7 @@ namespace ElevatorKata01
     /// Yeah, ok, I cheated a bit: I got thinking about it while cycling home, and ended up half-coding a whole solution in my head.
     /// The results are noted down here, but none of this code will be used until / unless it is called for to make tests pass.
     /// </summary>
-    internal class LiftSpares : IObservable<LiftStatus>, IDisposable
+    public class LiftSpares : IObservable<LiftStatus>, IDisposable
     {
         private IObservable<int> _liftEngine = null;
         private IDisposable _liftEngineSubscription = null;
@@ -23,7 +23,8 @@ namespace ElevatorKata01
         public LiftSpares(
             int startingFloor,
             IObservable<int> internalControlPanel,
-            IObservable<LiftCall> externalControlPanel)
+            IObservable<LiftCall> externalControlPanel,
+            IObservable<ILiftEvent> eventGenerator)
         {
             _currentFloor = startingFloor;
             _currentDirection = Direction.None;

@@ -18,10 +18,17 @@ namespace ElevatorKata01
         private const int TopFloor = 30;
         private const int BottomFloor = -10;
 
-        public ObservableLift(int startingFloor)
+        public ObservableLift(
+            int startingFloor,
+            IObservable<ILiftEvent> eventGenerator)
         {
             _currentFloor = startingFloor;
             _currentDirection = Direction.None;
+
+            eventGenerator.Subscribe
+                (
+                    OnNextLiftEvent
+                );
         }
 
         public IDisposable Subscribe(IObserver<LiftStatus> observer)
@@ -36,6 +43,11 @@ namespace ElevatorKata01
             {
                 observer.OnCompleted();
             }
+        }
+
+        public void OnNextLiftEvent(ILiftEvent liftEvent)
+        {
+            liftEvent.OnNext(this);
         }
 
         public void Move(int destinationFloor)
@@ -167,7 +179,7 @@ namespace ElevatorKata01
             }
         }
 
-        private void ArrivedAtFloorOnTheWayUp(int floor)
+        public void ArrivedAtFloorOnTheWayUp(int floor)
         {
             // TODO: What if we somehow find ourselves going up past the top floor??
 
@@ -183,7 +195,7 @@ namespace ElevatorKata01
             }
         }
 
-        private void ArrivedAtFloorOnTheWayDown(int floor)
+        public void ArrivedAtFloorOnTheWayDown(int floor)
         {
             // TODO: What if we somehow find ourselves going down past the bottom floor??
 
