@@ -14,6 +14,16 @@ elevator kata - first attempt (see http://blog.milesburton.com/2013/03/28/elevat
 
 Related links:
 
+ReactiveX installer:
+https://www.microsoft.com/en-us/download/details.aspx?id=30708
+ 
+ReactiveX tutorials (I’m working my way through “Curing the asynchronous blues with the Reactive Extensions for .NET” – see “Tutorials and Articles” at the bottom of the page):
+https://msdn.microsoft.com/en-gb/data/gg577611
+
+Using schedulers for testing:
+http://www.introtorx.com/content/v1.0.10621.0/16_TestingRx.html
+http://haacked.com/archive/2014/03/10/master-time-with-reactive-extensions/
+
 http://www.quora.com/Is-there-any-public-elevator-scheduling-algorithm-standard
 
 http://www.quora.com/Why-are-virtually-all-elevator-algorithms-so-inefficient
