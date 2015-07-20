@@ -41,17 +41,31 @@ namespace ElevatorKata01
             }
         }
 
+        public bool NotMoving
+        {
+            get
+            {
+                return (_currentDirection == Direction.None);
+            }
+        }
+
         public void Move(int destinationFloor)
         {
             if (destinationFloor > _currentFloor)
             {
                 _goingUp.Add(destinationFloor);
-                MoveUpwards();
+                if (NotMoving)
+                {
+                    MoveUpwards();
+                }
             }
             else
             {
                 _goingDown.Add(destinationFloor);
-                MoveDownwards();
+                if (NotMoving)
+                {
+                    MoveDownwards();
+                }
             }
         }
 
@@ -64,10 +78,10 @@ namespace ElevatorKata01
         {
             _liftEngine = Observable.Generate
                 (
-                    _currentFloor - 1,
-                    i => i < LastUpFloor,
+                    _currentFloor,
+                    i => i <= LastUpFloor,
                     i => i + 1, // iterator
-                    i => i + 1, // actual value? Shouldn't use same val as iterator?
+                    i => i, // actual value
                     i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
                     _scheduler
                 );
@@ -84,10 +98,10 @@ namespace ElevatorKata01
         {
             _liftEngine = Observable.Generate
                 (
-                    _currentFloor + 1,
-                    i => i > LastDownFloor,
+                    _currentFloor,
+                    i => i >= LastDownFloor,
                     i => i - 1, // iterator
-                    i => i - 1, // actual value? Shouldn't use same val as iterator?
+                    i => i, // actual value
                     i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
                     _scheduler
                 );
