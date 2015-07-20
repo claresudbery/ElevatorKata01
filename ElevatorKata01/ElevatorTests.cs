@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 
 namespace ElevatorKata01
@@ -23,168 +24,314 @@ namespace ElevatorKata01
         public void When_person_in_lift_enters_a_higher_floor_number_then_lift_starts_moving_upwards()
         {
             // Arrange
-            var theLift = new ObservableLift(GroundFloor);
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
             _liftStatuses.Clear();
             theLift.Subscribe(this);
 
             // Act
             theLift.Move(ThirdFloor);
-            Thread.Sleep(50);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
 
             // Assert
-            Assert.That(_liftStatuses.Count, Is.EqualTo(1));
+            Assert.That(_liftStatuses.Count, Is.GreaterThan(0));
+
             Assert.That(_liftStatuses[0].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[0].CurrentFloor, Is.EqualTo(GroundFloor));
         }
 
         [Test]
         public void When_person_in_lift_enters_a_lower_floor_number_then_lift_starts_moving_downwards()
         {
             // Arrange
-            var theLift = new ObservableLift(FirstFloor);
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(ThirdFloor, testScheduler);
             _liftStatuses.Clear();
             theLift.Subscribe(this);
 
             // Act
-            theLift.Move(GroundFloor);
-            Thread.Sleep(50);
+            theLift.Move(FirstFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
 
             // Assert
-            Assert.That(_liftStatuses.Count, Is.EqualTo(1));
+            Assert.That(_liftStatuses.Count, Is.GreaterThan(0));
+
             Assert.That(_liftStatuses[0].CurrentDirection, Is.EqualTo(Direction.Down));
+            Assert.That(_liftStatuses[0].CurrentFloor, Is.EqualTo(ThirdFloor));
+        }
+
+        [Test]
+        public void When_person_in_lift_enters_a_floor_number_then_lift_notifies_direction_and_location_for_every_floor_it_passes()
+        {
+            // Arrange
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.Move(ThirdFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.EqualTo(4));
+
+            Assert.That(_liftStatuses[0].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[0].CurrentFloor, Is.EqualTo(GroundFloor));
+
+            Assert.That(_liftStatuses[1].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[1].CurrentFloor, Is.EqualTo(FirstFloor));
+
+            Assert.That(_liftStatuses[2].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[2].CurrentFloor, Is.EqualTo(SecondFloor));
+
+            Assert.That(_liftStatuses[3].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[3].CurrentFloor, Is.EqualTo(ThirdFloor));
+        }
+
+        [Test]
+        public void When_person_in_lift_enters_a_higher_floor_number_then_lift_engine_is_asked_to_move_upwards_and_then_stopped_when_it_reaches_destination()
+        {
+            // Arrange
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.Move(ThirdFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.EqualTo(4));
+
+            Assert.That(_liftStatuses[0].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[0].CurrentFloor, Is.EqualTo(GroundFloor));
+
+            Assert.That(_liftStatuses[3].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[3].CurrentFloor, Is.EqualTo(ThirdFloor));
         }
 
         [Test]
         public void When_person_in_lift_enters_a_floor_number_then_lift_notifies_its_current_location()
         {
             // Arrange
-            var theLift = new ObservableLift(GroundFloor);
-            _liftStatuses.Clear();
-            theLift.Subscribe(this);
-
-            // Act
-            theLift.Move(ThirdFloor);
-
-            // Assert
-            Assert.That(_liftStatuses.Count, Is.EqualTo(1));
-            Assert.That(_liftStatuses[0].CurrentFloor, Is.EqualTo(GroundFloor));
-        }
-
-        [Test]
-        public void When_person_in_lift_enters_a_floor_number_then_lift_arrives_at_next_floor_after_one_second()
-        {
-            // Arrange
-            var theLift = new ObservableLift(GroundFloor);
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
             _liftStatuses.Clear();
             theLift.Subscribe(this);
 
             // Act
             theLift.Move(FirstFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
 
             // Assert
-            Thread.Sleep(1050);
-            Assert.That(_liftStatuses.Count, Is.EqualTo(2));
-            Assert.That(_liftStatuses[1].CurrentFloor, Is.EqualTo(FirstFloor));
+            Assert.That(_liftStatuses.Count, Is.GreaterThan(0));
+
+            Assert.That(_liftStatuses[0].CurrentFloor, Is.EqualTo(GroundFloor));
+        }
+
+        [Test]
+        public void When_person_in_lift_enters_a_floor_number_then_lift_goes_to_that_floor()
+        {
+            // Arrange
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.Move(FourthFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.EqualTo(5));
+
+            Assert.That(_liftStatuses[4].CurrentFloor, Is.EqualTo(FourthFloor));
         }
 
         [Test]
         public void When_lift_arrives_at_new_floor_after_person_in_lift_makes_request_then_lift_stops_moving()
         {
             // Arrange
-            var theLift = new ObservableLift(GroundFloor);
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
             _liftStatuses.Clear();
             theLift.Subscribe(this);
 
             // Act
-            theLift.Move(FirstFloor);
+            theLift.Move(FourthFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
 
             // Assert
-            Thread.Sleep(1050);
-            Assert.That(_liftStatuses.Count, Is.EqualTo(2));
-            Assert.That(_liftStatuses[1].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses.Count, Is.GreaterThan(1));
+
+            Assert.That(_liftStatuses[_liftStatuses.Count - 1].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[_liftStatuses.Count - 1].CurrentFloor, Is.EqualTo(FourthFloor));
         }
 
         [Test]
-        public void When_person_calls_lift_to_higher_floor_then_lift_starts_moving_upwards()
+        public void When_person_calls_lift_to_higher_floor_number_then_lift_starts_moving_upwards()
         {
             // Arrange
-            var theLift = new ObservableLift(GroundFloor);
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
             _liftStatuses.Clear();
             theLift.Subscribe(this);
 
             // Act
             theLift.Call(ThirdFloor);
-            Thread.Sleep(50);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
 
             // Assert
-            Assert.That(_liftStatuses.Count, Is.EqualTo(1));
+            Assert.That(_liftStatuses.Count, Is.GreaterThan(0));
+
             Assert.That(_liftStatuses[0].CurrentDirection, Is.EqualTo(Direction.Up));
-        }
-
-        [Test]
-        public void When_person_calls_lift_to_lower_floor_then_lift_starts_moving_downwards()
-        {
-            // Arrange
-            var theLift = new ObservableLift(FirstFloor);
-            _liftStatuses.Clear();
-            theLift.Subscribe(this);
-
-            // Act
-            theLift.Call(GroundFloor);
-            Thread.Sleep(50);
-
-            // Assert
-            Assert.That(_liftStatuses.Count, Is.EqualTo(1));
-            Assert.That(_liftStatuses[0].CurrentDirection, Is.EqualTo(Direction.Down));
-        }
-
-        [Test]
-        public void When_person_calls_lift_then_lift_notifies_its_current_location()
-        {
-            // Arrange
-            var theLift = new ObservableLift(GroundFloor);
-            _liftStatuses.Clear();
-            theLift.Subscribe(this);
-
-            // Act
-            theLift.Call(ThirdFloor);
-
-            // Assert
-            Assert.That(_liftStatuses.Count, Is.EqualTo(1));
             Assert.That(_liftStatuses[0].CurrentFloor, Is.EqualTo(GroundFloor));
         }
 
         [Test]
-        public void When_person_calls_lift_to_new_floor_then_lift_arrives_at_next_floor_after_floor_interval()
+        public void When_person_calls_lift_to_lower_floor_number_then_lift_starts_moving_downwards()
         {
             // Arrange
-            var theLift = new ObservableLift(GroundFloor);
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(ThirdFloor, testScheduler);
             _liftStatuses.Clear();
             theLift.Subscribe(this);
 
             // Act
             theLift.Call(FirstFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
 
             // Assert
-            Thread.Sleep(TimeConstants.FloorInterval + 50);
-            Assert.That(_liftStatuses.Count, Is.EqualTo(2));
-            Assert.That(_liftStatuses[1].CurrentFloor, Is.EqualTo(FirstFloor));
+            Assert.That(_liftStatuses.Count, Is.GreaterThan(0));
+
+            Assert.That(_liftStatuses[0].CurrentDirection, Is.EqualTo(Direction.Down));
+            Assert.That(_liftStatuses[0].CurrentFloor, Is.EqualTo(ThirdFloor));
         }
 
         [Test]
-        public void When_lift_arrives_at_new_floor_after_person_outside_lift_calls_it_then_lift_stops_moving()
+        public void When_person_calls_lift_to_floor_number_then_lift_notifies_direction_and_location_for_every_floor_it_passes()
         {
             // Arrange
-            var theLift = new ObservableLift(GroundFloor);
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.Call(ThirdFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.EqualTo(4));
+
+            Assert.That(_liftStatuses[0].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[0].CurrentFloor, Is.EqualTo(GroundFloor));
+
+            Assert.That(_liftStatuses[1].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[1].CurrentFloor, Is.EqualTo(FirstFloor));
+
+            Assert.That(_liftStatuses[2].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[2].CurrentFloor, Is.EqualTo(SecondFloor));
+
+            Assert.That(_liftStatuses[3].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[3].CurrentFloor, Is.EqualTo(ThirdFloor));
+        }
+
+        [Test]
+        public void When_person_calls_lift_to_higher_floor_number_then_lift_moves_upwards_and_then_stops_when_it_reaches_destination()
+        {
+            // Arrange
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+            
+            // Act
+            theLift.Call(ThirdFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
+            
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.EqualTo(4));
+            
+            Assert.That(_liftStatuses[0].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[0].CurrentFloor, Is.EqualTo(GroundFloor));
+            
+            Assert.That(_liftStatuses[3].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[3].CurrentFloor, Is.EqualTo(ThirdFloor));
+        }
+
+        [Test]
+        public void When_person_calls_lift_to_floor_number_then_lift_notifies_its_current_location()
+        {
+            // Arrange
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
             _liftStatuses.Clear();
             theLift.Subscribe(this);
 
             // Act
             theLift.Call(FirstFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
 
             // Assert
-            Thread.Sleep(1050);
-            Assert.That(_liftStatuses.Count, Is.EqualTo(2));
-            Assert.That(_liftStatuses[1].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses.Count, Is.GreaterThan(0));
+
+            Assert.That(_liftStatuses[0].CurrentFloor, Is.EqualTo(GroundFloor));
+        }
+
+        [Test]
+        public void When_person_calls_lift_to_floor_number_then_lift_goes_to_that_floor()
+        {
+            // Arrange
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.Call(FourthFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.EqualTo(5));
+
+            Assert.That(_liftStatuses[4].CurrentFloor, Is.EqualTo(FourthFloor));
+        }
+
+        [Test]
+        public void When_lift_arrives_at_new_floor_after_person_calls_lift_then_lift_stops_moving()
+        {
+            // Arrange
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.Call(FourthFloor);
+            testScheduler.Start();
+            testScheduler.AdvanceBy(5);
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.GreaterThan(1));
+
+            Assert.That(_liftStatuses[_liftStatuses.Count - 1].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[_liftStatuses.Count - 1].CurrentFloor, Is.EqualTo(FourthFloor));
         }
 
         //[Test]

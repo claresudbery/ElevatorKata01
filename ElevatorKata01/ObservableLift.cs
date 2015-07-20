@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
 namespace ElevatorKata01
@@ -14,14 +15,16 @@ namespace ElevatorKata01
         private IDisposable _liftEngineSubscription = null;
         private readonly List<int> _goingUp = new List<int>();
         private readonly List<int> _goingDown = new List<int>();
+        private IScheduler _scheduler;
 
         private const int TopFloor = 30;
         private const int BottomFloor = -10;
 
-        public ObservableLift(int startingFloor)
+        public ObservableLift(int startingFloor, IScheduler scheduler)
         {
             _currentFloor = startingFloor;
             _currentDirection = Direction.None;
+            _scheduler = scheduler;
         }
 
         public IDisposable Subscribe(IObserver<LiftStatus> observer)
@@ -61,11 +64,12 @@ namespace ElevatorKata01
         {
             _liftEngine = Observable.Generate
                 (
-                    _currentFloor,
+                    _currentFloor - 1,
                     i => i < LastUpFloor,
                     i => i + 1, // iterator
                     i => i + 1, // actual value? Shouldn't use same val as iterator?
-                    i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval)
+                    i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
+                    _scheduler
                 );
 
             _currentDirection = Direction.Up;
@@ -74,19 +78,18 @@ namespace ElevatorKata01
                 (
                     ArrivedAtFloorOnTheWayUp
                 );
-
-            NotifyObserversOfCurrentStatus();
         }
 
         private void MoveDownwards()
         {
             _liftEngine = Observable.Generate
                 (
-                    _currentFloor,
+                    _currentFloor + 1,
                     i => i > LastDownFloor,
                     i => i - 1, // iterator
                     i => i - 1, // actual value? Shouldn't use same val as iterator?
-                    i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval)
+                    i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
+                    _scheduler
                 );
 
             _currentDirection = Direction.Down;
@@ -95,8 +98,6 @@ namespace ElevatorKata01
                 (
                     ArrivedAtFloorOnTheWayDown
                 );
-
-            NotifyObserversOfCurrentStatus();
         }
 
         public bool NoUpFloors
@@ -187,12 +188,12 @@ namespace ElevatorKata01
         {
             // TODO: What if we somehow find ourselves going down past the bottom floor??
 
-            _currentFloor = floor;
-
             if (floor == NextDownFloor)
             {
                 Stop();
             }
+
+            _currentFloor = floor;
 
             NotifyObserversOfCurrentStatus();
         }
