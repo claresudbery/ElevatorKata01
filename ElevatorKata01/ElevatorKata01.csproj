@@ -54,7 +54,6 @@
   <ItemGroup>
     <Compile Include="Call.cs" />
     <Compile Include="ILiftMonitor.cs" />
-    <Compile Include="ILiftEvent.cs" />
     <Compile Include="LiftSpares.cs" />
     <Compile Include="LiftStatus.cs" />
     <Compile Include="Direction.cs" />

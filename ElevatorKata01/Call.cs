@@ -1,6 +1,6 @@
 ﻿namespace ElevatorKata01
 {
-    public struct LiftCall_Original
+    public struct LiftCall
     {
         public Direction RequestedDirection;
         public int RequestedFloor;
