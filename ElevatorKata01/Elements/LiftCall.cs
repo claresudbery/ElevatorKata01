@@ -1,4 +1,4 @@
-﻿namespace ElevatorKata01
+﻿namespace ElevatorKata01.Elements
 {
     public struct LiftCall
     {

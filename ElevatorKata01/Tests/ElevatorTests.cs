@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Concurrency;
-using System.Threading;
+using ElevatorKata01.Elements;
+using ElevatorKata01.FunctionalCode;
 using Microsoft.Reactive.Testing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NUnit.Framework;
 using Assert = NUnit.Framework.Assert;
 
-namespace ElevatorKata01
+namespace ElevatorKata01.Tests
 {
     [TestFixture]
     public class ElevatorTests : ILiftMonitor
     {
-        private List<Floor> _floorsVisited = new List<Floor>();
-        private List<LiftStatus> _liftStatuses = new List<LiftStatus>();
+        private readonly List<LiftStatus> _liftStatuses = new List<LiftStatus>();
 
         private const int GroundFloor = 0;
         private const int FirstFloor = 1;

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using ElevatorKata01.Elements;
 
-namespace ElevatorKata01
+namespace ElevatorKata01.FunctionalCode
 {
     public class ObservableLift : IObservable<LiftStatus>, IDisposable
     {
@@ -16,10 +17,7 @@ namespace ElevatorKata01
         private IDisposable _liftEngineSubscription = null;
         private readonly List<int> _goingUp = new List<int>();
         private readonly List<int> _goingDown = new List<int>();
-        private IScheduler _scheduler;
-
-        private const int TopFloor = 30;
-        private const int BottomFloor = -10;
+        private readonly IScheduler _scheduler;
 
         public ObservableLift(int startingFloor, IScheduler scheduler)
         {
@@ -43,14 +41,6 @@ namespace ElevatorKata01
             }
         }
 
-        public bool NotMoving
-        {
-            get
-            {
-                return (_moving == false);
-            }
-        }
-
         public void Move(int destinationFloor)
         {
             if (destinationFloor > _currentFloor)
@@ -68,6 +58,19 @@ namespace ElevatorKata01
             }
         }
 
+        public void Call(int destinationFloor)
+        {
+            Move(destinationFloor);
+        }
+
+        private bool NotMoving
+        {
+            get
+            {
+                return (_moving == false);
+            }
+        }
+
         private void MoveInCorrectDirection()
         {
             if (_currentDirection != Direction.Down && UpFloorsWaiting)
@@ -78,11 +81,6 @@ namespace ElevatorKata01
             {
                 MoveDownwards();
             }
-        }
-
-        public void Call(int destinationFloor)
-        {
-            Move(destinationFloor);
         }
 
         private void MoveUpwards()
@@ -127,7 +125,7 @@ namespace ElevatorKata01
                 );
         }
 
-        public bool NoUpFloors
+        private bool NoUpFloors
         {
             get
             {
@@ -135,7 +133,7 @@ namespace ElevatorKata01
             }
         }
 
-        public bool NoDownFloors
+        private bool NoDownFloors
         {
             get
             {
@@ -143,7 +141,7 @@ namespace ElevatorKata01
             }
         }
 
-        public bool UpFloorsWaiting
+        private bool UpFloorsWaiting
         {
             get
             {
@@ -151,7 +149,7 @@ namespace ElevatorKata01
             }
         }
 
-        public bool DownFloorsWaiting
+        private bool DownFloorsWaiting
         {
             get
             {
@@ -184,7 +182,7 @@ namespace ElevatorKata01
             }
         }
 
-        public int NextUpFloor
+        private int NextUpFloor
         {
             get
             {
@@ -202,7 +200,7 @@ namespace ElevatorKata01
             }
         }
 
-        public int NextDownFloor
+        private int NextDownFloor
         {
             get
             {
