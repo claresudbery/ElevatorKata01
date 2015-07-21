@@ -299,6 +299,36 @@ namespace ElevatorKata01
             Assert.That(_liftStatuses[2].CurrentFloor, Is.EqualTo(SecondFloor));
         }
 
+        [Test]
+        public void When_two_people_on_different_floors_call_lift_upwards_and_first_person_tries_to_go_downwards_then_lift_will_go_up_for_other_person_first()
+        {
+            // Arrange
+            int betweenFirstAndSecondFloors = (2 * TimeConstants.FloorInterval) + 500;
+            int afterSecondFloor = (3 * TimeConstants.FloorInterval) + 500;
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.Call(FourthFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.Call(SecondFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterSecondFloor), () => theLift.Move(GroundFloor));
+            testScheduler.Start();
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.GreaterThan(1));
+
+            Assert.That(_liftStatuses[3].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[3].CurrentFloor, Is.EqualTo(SecondFloor));
+
+            Assert.That(_liftStatuses[4].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[4].CurrentFloor, Is.EqualTo(ThirdFloor));
+
+            Assert.That(_liftStatuses[5].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[5].CurrentFloor, Is.EqualTo(FourthFloor));
+        }
+
         public void OnNext(LiftStatus currentLiftStatus)
         {
             _liftStatuses.Add(currentLiftStatus);

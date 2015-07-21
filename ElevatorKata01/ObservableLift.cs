@@ -10,6 +10,7 @@ namespace ElevatorKata01
     {
         private readonly List<IObserver<LiftStatus>> _observers = new List<IObserver<LiftStatus>>();
         private int _currentFloor;
+        private bool _moving;
         private Direction _currentDirection;
         private IObservable<int> _liftEngine = null;
         private IDisposable _liftEngineSubscription = null;
@@ -23,6 +24,7 @@ namespace ElevatorKata01
         public ObservableLift(int startingFloor, IScheduler scheduler)
         {
             _currentFloor = startingFloor;
+            _moving = false;
             _currentDirection = Direction.None;
             _scheduler = scheduler;
         }
@@ -45,7 +47,7 @@ namespace ElevatorKata01
         {
             get
             {
-                return (_currentDirection == Direction.None);
+                return (_moving == false);
             }
         }
 
@@ -54,18 +56,27 @@ namespace ElevatorKata01
             if (destinationFloor > _currentFloor)
             {
                 _goingUp.Add(destinationFloor);
-                if (NotMoving)
-                {
-                    MoveUpwards();
-                }
             }
             else
             {
                 _goingDown.Add(destinationFloor);
-                if (NotMoving)
-                {
-                    MoveDownwards();
-                }
+            }
+
+            if (NotMoving)
+            {
+                MoveInCorrectDirection();
+            }
+        }
+
+        private void MoveInCorrectDirection()
+        {
+            if (_currentDirection != Direction.Down && UpFloorsWaiting)
+            {
+                MoveUpwards();
+            }
+            else
+            {
+                MoveDownwards();
             }
         }
 
@@ -87,6 +98,7 @@ namespace ElevatorKata01
                 );
 
             _currentDirection = Direction.Up;
+            _moving = true;
 
             _liftEngineSubscription = _liftEngine.Subscribe
                 (
@@ -107,6 +119,7 @@ namespace ElevatorKata01
                 );
 
             _currentDirection = Direction.Down;
+            _moving = true;
 
             _liftEngineSubscription = _liftEngine.Subscribe
                 (
@@ -127,6 +140,22 @@ namespace ElevatorKata01
             get
             {
                 return !_goingDown.Any();
+            }
+        }
+
+        public bool UpFloorsWaiting
+        {
+            get
+            {
+                return _goingUp.Any();
+            }
+        }
+
+        public bool DownFloorsWaiting
+        {
+            get
+            {
+                return _goingDown.Any();
             }
         }
 
@@ -214,7 +243,7 @@ namespace ElevatorKata01
 
         private void Stop()
         {
-            _currentDirection = Direction.None;
+            _moving = false;
             _liftEngineSubscription.Dispose();
             NotifyObserversOfCurrentStatus();
         }
@@ -227,7 +256,7 @@ namespace ElevatorKata01
                 (
                     new LiftStatus
                     {
-                        CurrentDirection = _currentDirection,
+                        CurrentDirection = _moving ? _currentDirection : Direction.None,
                         CurrentFloor = _currentFloor
                     }
                 );
