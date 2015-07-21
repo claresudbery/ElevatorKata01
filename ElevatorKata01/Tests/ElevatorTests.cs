@@ -328,6 +328,12 @@ namespace ElevatorKata01.Tests
             Assert.That(_liftStatuses[5].CurrentFloor, Is.EqualTo(FourthFloor));
         }
 
+        [Test]
+        public void When_lift_is_moving_upwards_and_person_between_lift_and_destination_calls_lift_then_lift_will_only_pick_them_up_if_they_want_to_move_upwards()
+        {
+			Not implemented yet!
+		}
+
         public void OnNext(LiftStatus currentLiftStatus)
         {
             _liftStatuses.Add(currentLiftStatus);
