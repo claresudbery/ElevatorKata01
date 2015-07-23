@@ -45,22 +45,36 @@ namespace ElevatorKata01.FunctionalCode
         {
             if (destinationFloor > _currentFloor)
             {
-                _goingUp.Add(destinationFloor);
+                MoveUp(destinationFloor);
             }
             else
             {
-                _goingDown.Add(destinationFloor);
-            }
-
-            if (NotMoving)
-            {
-                MoveInCorrectDirection();
+                MoveDown(destinationFloor);
             }
         }
 
-        public void Call(int destinationFloor)
+        public void MoveUp(int destinationFloor)
         {
-            Move(destinationFloor);
+            _goingUp.Add(destinationFloor);
+
+            MoveInCorrectDirection();
+        }
+
+        public void MoveDown(int destinationFloor)
+        {
+            _goingDown.Add(destinationFloor);
+
+            MoveInCorrectDirection();
+        }
+
+        public void CallUp(int destinationFloor)
+        {
+            MoveUp(destinationFloor);
+        }
+
+        public void CallDown(int destinationFloor)
+        {
+            MoveDown(destinationFloor);
         }
 
         private bool NotMoving
@@ -73,13 +87,16 @@ namespace ElevatorKata01.FunctionalCode
 
         private void MoveInCorrectDirection()
         {
-            if (_currentDirection != Direction.Down && UpFloorsWaiting)
+            if (NotMoving)
             {
-                MoveUpwards();
-            }
-            else
-            {
-                MoveDownwards();
+                if (_currentDirection != Direction.Down && UpFloorsWaiting)
+                {
+                    MoveUpwards();
+                }
+                else
+                {
+                    MoveDownwards();
+                }
             }
         }
 

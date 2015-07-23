@@ -159,7 +159,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Call(ThirdFloor);
+            theLift.CallUp(ThirdFloor);
             testScheduler.Start();
 
             // Assert
@@ -179,7 +179,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Call(FirstFloor);
+            theLift.CallDown(FirstFloor);
             testScheduler.Start();
 
             // Assert
@@ -199,7 +199,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Call(ThirdFloor);
+            theLift.CallUp(ThirdFloor);
             testScheduler.Start();
 
             // Assert
@@ -228,7 +228,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Call(FirstFloor);
+            theLift.CallUp(FirstFloor);
             testScheduler.Start();
 
             // Assert
@@ -247,7 +247,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Call(FourthFloor);
+            theLift.CallUp(FourthFloor);
             testScheduler.Start();
 
             // Assert
@@ -266,7 +266,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Call(FourthFloor);
+            theLift.CallUp(FourthFloor);
             testScheduler.Start();
 
             // Assert
@@ -287,14 +287,36 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Call(FourthFloor);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.Call(SecondFloor));
+            theLift.CallUp(FourthFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallUp(SecondFloor));
             testScheduler.Start();
 
             // Assert
             Assert.That(_liftStatuses.Count, Is.GreaterThan(1));
 
             Assert.That(_liftStatuses[2].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[2].CurrentFloor, Is.EqualTo(SecondFloor));
+        }
+
+        [Test]
+        public void When_lift_is_moving_upwards_and_person_between_lift_and_destination_calls_lift_downwards_then_lift_will_not_pick_them_up()
+        {
+            // Arrange
+            int betweenFirstAndSecondFloors = (2 * TimeConstants.FloorInterval) + 500;
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.CallUp(FourthFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallDown(SecondFloor));
+            testScheduler.Start();
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.GreaterThan(1));
+
+            Assert.That(_liftStatuses[2].CurrentDirection, Is.EqualTo(Direction.Up));
             Assert.That(_liftStatuses[2].CurrentFloor, Is.EqualTo(SecondFloor));
         }
 
@@ -310,8 +332,8 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Call(FourthFloor);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.Call(SecondFloor));
+            theLift.CallUp(FourthFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallUp(SecondFloor));
             testScheduler.Schedule(TimeSpan.FromMilliseconds(afterSecondFloor), () => theLift.Move(GroundFloor));
             testScheduler.Start();
 
@@ -327,17 +349,6 @@ namespace ElevatorKata01.Tests
             Assert.That(_liftStatuses[5].CurrentDirection, Is.EqualTo(Direction.None));
             Assert.That(_liftStatuses[5].CurrentFloor, Is.EqualTo(FourthFloor));
         }
-
-        [Test]
-        public void When_lift_is_moving_upwards_and_person_between_lift_and_destination_calls_lift_then_lift_will_only_pick_them_up_if_they_want_to_move_upwards()
-        {
-            //Not implemented yet!
-            // Notes: we will need a CallUp and a CallDown to replace the current Call
-            // We will probably also need a MoveUp and MoveDown which are called by CallUp and CallDown, and the common code can be moved into a common method.
-            // The Move call will then have its own way of determining whether to call MoveUp or MoveDown
-            // The difference being that a CallUp call will result in a destination being added to goingUp, 
-            // whether or not the call was made from a floor higher than the lift's current location.
-		}
 
         public void OnNext(LiftStatus currentLiftStatus)
         {
