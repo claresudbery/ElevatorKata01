@@ -331,7 +331,12 @@ namespace ElevatorKata01.Tests
         [Test]
         public void When_lift_is_moving_upwards_and_person_between_lift_and_destination_calls_lift_then_lift_will_only_pick_them_up_if_they_want_to_move_upwards()
         {
-			Not implemented yet!
+            //Not implemented yet!
+            // Notes: we will need a CallUp and a CallDown to replace the current Call
+            // We will probably also need a MoveUp and MoveDown which are called by CallUp and CallDown, and the common code can be moved into a common method.
+            // The Move call will then have its own way of determining whether to call MoveUp or MoveDown
+            // The difference being that a CallUp call will result in a destination being added to goingUp, 
+            // whether or not the call was made from a floor higher than the lift's current location.
 		}
 
         public void OnNext(LiftStatus currentLiftStatus)
