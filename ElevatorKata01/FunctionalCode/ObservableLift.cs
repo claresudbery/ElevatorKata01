@@ -45,44 +45,36 @@ namespace ElevatorKata01.FunctionalCode
         {
             if (destinationFloor > _currentFloor)
             {
-                MoveUp(destinationFloor);
+                ProcessUpwardsMoveRequest(destinationFloor);
             }
             else
             {
-                MoveDown(destinationFloor);
+                ProcessDownwardsMoveRequest(destinationFloor);
             }
         }
 
-        public void MoveUp(int destinationFloor)
+        public void CallUp(int destinationFloor)
+        {
+            ProcessUpwardsMoveRequest(destinationFloor);
+        }
+
+        public void CallDown(int destinationFloor)
+        {
+            ProcessDownwardsMoveRequest(destinationFloor);
+        }
+
+        private void ProcessUpwardsMoveRequest(int destinationFloor)
         {
             _goingUp.Add(destinationFloor);
 
             MoveInCorrectDirection();
         }
 
-        public void MoveDown(int destinationFloor)
+        private void ProcessDownwardsMoveRequest(int destinationFloor)
         {
             _goingDown.Add(destinationFloor);
 
             MoveInCorrectDirection();
-        }
-
-        public void CallUp(int destinationFloor)
-        {
-            MoveUp(destinationFloor);
-        }
-
-        public void CallDown(int destinationFloor)
-        {
-            MoveDown(destinationFloor);
-        }
-
-        private bool NotMoving
-        {
-            get
-            {
-                return (_moving == false);
-            }
         }
 
         private void MoveInCorrectDirection()
@@ -140,6 +132,44 @@ namespace ElevatorKata01.FunctionalCode
                 (
                     ArrivedAtFloorOnTheWayDown
                 );
+        }
+
+        private void ArrivedAtFloorOnTheWayUp(int floor)
+        {
+            // TODO: What if we somehow find ourselves going up past the top floor??
+
+            if (floor == NextUpFloor)
+            {
+                _currentFloor = floor;
+                Stop();
+            }
+            else
+            {
+                _currentFloor = floor;
+                NotifyObserversOfCurrentStatus();
+            }
+        }
+
+        private void ArrivedAtFloorOnTheWayDown(int floor)
+        {
+            // TODO: What if we somehow find ourselves going down past the bottom floor??
+
+            if (floor == NextDownFloor)
+            {
+                Stop();
+            }
+
+            _currentFloor = floor;
+
+            NotifyObserversOfCurrentStatus();
+        }
+
+        private bool NotMoving
+        {
+            get
+            {
+                return (_moving == false);
+            }
         }
 
         private bool NoUpFloors
@@ -224,36 +254,6 @@ namespace ElevatorKata01.FunctionalCode
                 CheckForDownFloors("NextDownFloor");
                 return _goingDown.Where(i => i < _currentFloor).Max();
             }
-        }
-
-        private void ArrivedAtFloorOnTheWayUp(int floor)
-        {
-            // TODO: What if we somehow find ourselves going up past the top floor??
-
-            if (floor == NextUpFloor)
-            {
-                _currentFloor = floor;
-                Stop();
-            }
-            else
-            {
-                _currentFloor = floor;
-                NotifyObserversOfCurrentStatus();
-            }
-        }
-
-        private void ArrivedAtFloorOnTheWayDown(int floor)
-        {
-            // TODO: What if we somehow find ourselves going down past the bottom floor??
-
-            if (floor == NextDownFloor)
-            {
-                Stop();
-            }
-
-            _currentFloor = floor;
-
-            NotifyObserversOfCurrentStatus();
         }
 
         private void Stop()
