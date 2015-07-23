@@ -13,8 +13,8 @@ namespace ElevatorKata01.FunctionalCode
         private int _currentFloor;
         private bool _moving;
         private Direction _currentDirection;
-        private IObservable<int> _liftEngine = null;
         private IDisposable _liftEngineSubscription = null;
+        private IDisposable _waitTimerSubscription = null;
         private readonly List<int> _goingUp = new List<int>();
         private readonly List<int> _goingDown = new List<int>();
         private readonly IScheduler _scheduler;
@@ -94,7 +94,7 @@ namespace ElevatorKata01.FunctionalCode
 
         private void MoveUpwards()
         {
-            _liftEngine = Observable.Generate
+            _liftEngineSubscription = Observable.Generate
                 (
                     _currentFloor,
                     i => i <= LastUpFloor,
@@ -102,20 +102,19 @@ namespace ElevatorKata01.FunctionalCode
                     i => i, // actual value
                     i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
                     _scheduler
+                )
+                .Subscribe
+                (
+                    ArrivedAtFloorOnTheWayUp
                 );
 
             _currentDirection = Direction.Up;
             _moving = true;
-
-            _liftEngineSubscription = _liftEngine.Subscribe
-                (
-                    ArrivedAtFloorOnTheWayUp
-                );
         }
 
         private void MoveDownwards()
         {
-            _liftEngine = Observable.Generate
+            _liftEngineSubscription = Observable.Generate
                 (
                     _currentFloor,
                     i => i >= LastDownFloor,
@@ -123,15 +122,14 @@ namespace ElevatorKata01.FunctionalCode
                     i => i, // actual value
                     i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
                     _scheduler
+                )
+                .Subscribe
+                (
+                    ArrivedAtFloorOnTheWayDown
                 );
 
             _currentDirection = Direction.Down;
             _moving = true;
-
-            _liftEngineSubscription = _liftEngine.Subscribe
-                (
-                    ArrivedAtFloorOnTheWayDown
-                );
         }
 
         private void ArrivedAtFloorOnTheWayUp(int floor)
@@ -142,6 +140,7 @@ namespace ElevatorKata01.FunctionalCode
             {
                 _currentFloor = floor;
                 Stop();
+                RemoveUpFloorFromDestinations(floor);
             }
             else
             {
@@ -157,11 +156,66 @@ namespace ElevatorKata01.FunctionalCode
             if (floor == NextDownFloor)
             {
                 Stop();
+                RemoveDownFloorFromDestinations(floor);
             }
 
             _currentFloor = floor;
 
             NotifyObserversOfCurrentStatus();
+        }
+
+        private void Stop()
+        {
+            _moving = false;
+            _liftEngineSubscription.Dispose();
+            NotifyObserversOfCurrentStatus();
+            WaitForNextInstruction();
+        }
+
+        private void WaitForNextInstruction()
+        {
+            if (null != _waitTimerSubscription)
+            {
+                _waitTimerSubscription.Dispose();
+                _waitTimerSubscription = null;
+            }
+
+            _waitTimerSubscription = Observable.Generate
+                (
+                    0,
+                    i => i <= 1,
+                    i => i + 1, // iterator
+                    i => i, // actual value
+                    i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval * 5),
+                    _scheduler
+                )
+                .Subscribe
+                (
+                    StopWaiting
+                );
+        }
+
+        private void StopWaiting(int i)
+        {
+            _waitTimerSubscription.Dispose();
+            _waitTimerSubscription = null;
+
+            MoveInCorrectDirection();
+        }
+
+        private void NotifyObserversOfCurrentStatus()
+        {
+            foreach (var observer in _observers)
+            {
+                observer.OnNext
+                (
+                    new LiftStatus
+                    {
+                        CurrentDirection = _moving ? _currentDirection : Direction.None,
+                        CurrentFloor = _currentFloor
+                    }
+                );
+            }
         }
 
         private bool NotMoving
@@ -202,6 +256,16 @@ namespace ElevatorKata01.FunctionalCode
             {
                 return _goingDown.Any();
             }
+        }
+
+        private void RemoveUpFloorFromDestinations(int floor)
+        {
+            _goingUp.Remove(floor);
+        }
+
+        private void RemoveDownFloorFromDestinations(int floor)
+        {
+            _goingDown.Remove(floor);
         }
 
         private void CheckForUpFloors(string itemRequested)
@@ -253,28 +317,6 @@ namespace ElevatorKata01.FunctionalCode
             {
                 CheckForDownFloors("NextDownFloor");
                 return _goingDown.Where(i => i < _currentFloor).Max();
-            }
-        }
-
-        private void Stop()
-        {
-            _moving = false;
-            _liftEngineSubscription.Dispose();
-            NotifyObserversOfCurrentStatus();
-        }
-
-        private void NotifyObserversOfCurrentStatus()
-        {
-            foreach (var observer in _observers)
-            {
-                observer.OnNext
-                (
-                    new LiftStatus
-                    {
-                        CurrentDirection = _moving ? _currentDirection : Direction.None,
-                        CurrentFloor = _currentFloor
-                    }
-                );
             }
         }
     }

@@ -350,6 +350,62 @@ namespace ElevatorKata01.Tests
             Assert.That(_liftStatuses[5].CurrentFloor, Is.EqualTo(FourthFloor));
         }
 
+        [Test]
+        public void When_downwards_request_is_made_after_upwards_request_then_lift_will_visit_downwards_person_after_servicing_upwards_request()
+        {
+            // Arrange
+            int betweenFirstAndSecondFloors = (2 * TimeConstants.FloorInterval) + 500;
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.CallUp(FourthFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallDown(SecondFloor));
+            testScheduler.Start();
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.GreaterThan(1));
+
+            Assert.That(_liftStatuses[4].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[4].CurrentFloor, Is.EqualTo(FourthFloor));
+
+            Assert.That(_liftStatuses[5].CurrentDirection, Is.EqualTo(Direction.Down));
+            Assert.That(_liftStatuses[5].CurrentFloor, Is.EqualTo(FourthFloor));
+
+            Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(SecondFloor));
+        }
+
+        [Test]
+        public void When_lift_moves_up_and_then_down_then_it_should_not_try_to_return_to_its_previous_up_destination()
+        {
+            //// Arrange
+            //int betweenFirstAndSecondFloors = (2 * TimeConstants.FloorInterval) + 500;
+            //var testScheduler = new TestScheduler();
+            //var theLift = new ObservableLift(GroundFloor, testScheduler);
+            //_liftStatuses.Clear();
+            //theLift.Subscribe(this);
+
+            //// Act
+            //theLift.CallUp(FourthFloor);
+            //testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallDown(SecondFloor));
+            //testScheduler.Start();
+
+            //// Assert
+            //Assert.That(_liftStatuses.Count, Is.GreaterThan(1));
+
+            //Assert.That(_liftStatuses[4].CurrentDirection, Is.EqualTo(Direction.None));
+            //Assert.That(_liftStatuses[4].CurrentFloor, Is.EqualTo(FourthFloor));
+
+            //Assert.That(_liftStatuses[5].CurrentDirection, Is.EqualTo(Direction.Down));
+            //Assert.That(_liftStatuses[5].CurrentFloor, Is.EqualTo(FourthFloor));
+
+            //Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.None));
+            //Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(SecondFloor));
+        }
+
         public void OnNext(LiftStatus currentLiftStatus)
         {
             _liftStatuses.Add(currentLiftStatus);
