@@ -54,14 +54,39 @@ Note that the basic algorithm being used at this point is pretty simple:
 			(and there is probably a danger that some poor person would get left stranded on the top floor because fetching them would never represent the most efficient use of the resource)
 	
 Tests which might need writing:
+When lift is first created, if it is not on the ground floor, after waiting for a bit it returns to the ground floor
 When_lift_moves_up_and_then_down_then_it_should_not_try_to_return_to_its_previous_up_destination
 	Remove destination from queue on arrival!
 Stops should be visited in the correct order (if people on floors 3, 5 7 and 9 are all travelling upwards but make their requests in a different order, they should still be visited in ascending order)
-When the lift reaches the highest stop on an upwards journey, it should go back down again (picking people up along the way if applicable).
-	However, this may involve moving further upwards, if the highest downwards-moving client is actually higher than the lift's current location
-When the lift reaches the lowest stop on a downwards journey, it should either 
-	a) pick up the lowest client on a list of upwards-moving clients and start moving upwards
-	or b) go back down to the ground floor
+When the lift reaches the highest stop on an upwards journey, it should either return to the ground floor or start processing any waiting downwards-moving requests.
+	There are six possibilities:
+		Lift is above the ground floor, but next downwards request has come from a higher floor
+		Lift is above the ground floor, and next downwards request has come from a lower floor
+		Lift is above the ground floor, and there are no waiting requests (in which case it returns DOWN to the ground floor)
+		Lift is below the ground floor, but next downwards request has come from a higher floor
+		Lift is below the ground floor, and next downwards request has come from a lower floor
+		Lift is below the ground floor, and there are no waiting requests (in which case it returns UP to the ground floor)
+When the lift reaches the lowest stop on a downwards journey, it should either return to the ground floor or start processing any waiting upwards-moving requests.
+	There are six possibilities:
+		Lift is below the ground floor, but next upwards request has come from a lower floor
+		Lift is below the ground floor, and next upwards request has come from a higher floor
+		Lift is below the ground floor, and there are no waiting requests (in which case it returns UP to the ground floor)
+		Lift is above the ground floor, but next upwards request has come from a lower floor
+		Lift is above the ground floor, and next upwards request has come from a higher floor
+		Lift is above the ground floor, and there are no waiting requests (in which case it returns DOWN to the ground floor)
+If the lift runs out of upwards requests 
+	... and starts processing downwards requests...
+	... but the next downwards request is coming from a higher floor...
+	... and while the lift is moving up to that floor, an upwards request comes in which lies between the lift's current location and the floor it is moving to...
+	... what should happen??
+		The problem is, that when the lift arrives at the location it has been called to, the caller might ask it to go to an even higher location than the one it was aiming for. 
+			...meaning that it would have to overshoot.
+			...and someone else might make an even higher upwards request while it processes the new one.
+		One solution is that we say No, we are now processing downwards requests and we will ignore all upwards requests until we are done with our downwards requests.
+			This is what is currently implemented, I think, because we say if direction is not Down then we are moving up (otherwise we are moving down)
+			The problem with this is that users will see the lift is coming towards them, but ignoring them and going straight past.
+		The alternative is that if an upwards request comes in which we are able to service on our way to the downwards request, we just cancel the downwards strategy and consider ourselves to be moving upwards again.
+Consider all test scenarios and make sure they include negative floor numbers.
 If new downwards-moving requests are made while the lift is moving downwards, they only get picked up if their location is equal to or lower than the lift's current location.
 If new upwards-moving requests are made while the lift is moving upwards, they only get picked up if their location is equal to or higher than the lift's current location.
 Simpler lift-stopping algorithm:
@@ -84,6 +109,7 @@ More sophisticated lift-stopping algorithm:
 	it will ignore the exiting requirement and prioritise the boarding requirement, ie it will move on after either	
 		a) somebody tells the lift where they want to go
 		b) a certain amount of time has elapsed
+If the lift is called down to a negative floor, if no requests are made then it should return back up to the ground floor.
 		
 Possible technologies for a UI (recommended by Braithers):
 	Ruby + Sinatra

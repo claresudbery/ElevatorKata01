@@ -11,20 +11,22 @@ namespace ElevatorKata01.FunctionalCode
     {
         private readonly List<IObserver<LiftStatus>> _observers = new List<IObserver<LiftStatus>>();
         private int _currentFloor;
-        private bool _moving;
-        private Direction _currentDirection;
+        private Direction _currentDirectionBeingProcessed;
+        private Direction _currentDirectionActuallyMovingIn;
         private IDisposable _liftEngineSubscription = null;
         private IDisposable _waitTimerSubscription = null;
         private readonly List<int> _goingUp = new List<int>();
         private readonly List<int> _goingDown = new List<int>();
         private readonly IScheduler _scheduler;
+        private const int GroundFloor = 0;
 
         public ObservableLift(int startingFloor, IScheduler scheduler)
         {
             _currentFloor = startingFloor;
-            _moving = false;
-            _currentDirection = Direction.None;
+            _currentDirectionBeingProcessed = Direction.None;
+            _currentDirectionActuallyMovingIn = Direction.None;
             _scheduler = scheduler;
+            WaitForNextInstruction();
         }
 
         public IDisposable Subscribe(IObserver<LiftStatus> observer)
@@ -81,26 +83,39 @@ namespace ElevatorKata01.FunctionalCode
         {
             if (NotMoving)
             {
-                if (_currentDirection != Direction.Down && UpFloorsWaiting)
+                if (_currentDirectionBeingProcessed != Direction.Down && UpFloorsWaiting)
                 {
                     MoveUpwards();
                 }
-                else
+                else if (DownFloorsWaiting)
                 {
                     MoveDownwards();
+                }
+                else
+                {
+                    if (_currentFloor != GroundFloor)
+                    {
+                        ReturnToGroundFloor();
+                    }
                 }
             }
         }
 
         private void MoveUpwards()
         {
+            int nextUpFloor = NextUpFloor;
+
             _liftEngineSubscription = Observable.Generate
                 (
                     _currentFloor,
-                    i => i <= LastUpFloor,
-                    i => i + 1, // iterator
-                    i => i, // actual value
-                    i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
+                    floor => _currentFloor < nextUpFloor 
+                        ? HaveWeArrivedAtHigherDestinationYet(floor, nextUpFloor) 
+                        : HaveWeArrivedAtLowerDestinationYet(floor, nextUpFloor),
+                    floor => _currentFloor < nextUpFloor 
+                        ? NextFloorUp(floor)
+                        : NextFloorDown(floor), // iterator
+                    floor => floor, // actual value
+                    floor => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
                     _scheduler
                 )
                 .Subscribe
@@ -108,19 +123,25 @@ namespace ElevatorKata01.FunctionalCode
                     ArrivedAtFloorOnTheWayUp
                 );
 
-            _currentDirection = Direction.Up;
-            _moving = true;
+            _currentDirectionBeingProcessed = Direction.Up;
+            _currentDirectionActuallyMovingIn = _currentFloor < nextUpFloor ? Direction.Up : Direction.Down;
         }
 
         private void MoveDownwards()
         {
+            int nextDownFloor = NextDownFloor;
+
             _liftEngineSubscription = Observable.Generate
                 (
                     _currentFloor,
-                    i => i >= LastDownFloor,
-                    i => i - 1, // iterator
-                    i => i, // actual value
-                    i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
+                    floor => _currentFloor > nextDownFloor
+                        ? HaveWeArrivedAtLowerDestinationYet(floor, nextDownFloor)
+                        : HaveWeArrivedAtHigherDestinationYet(floor, nextDownFloor),
+                    floor => _currentFloor > nextDownFloor
+                        ? NextFloorDown(floor)
+                        : NextFloorUp(floor), // iterator
+                    floor => floor, // actual value
+                    floor => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
                     _scheduler
                 )
                 .Subscribe
@@ -128,8 +149,32 @@ namespace ElevatorKata01.FunctionalCode
                     ArrivedAtFloorOnTheWayDown
                 );
 
-            _currentDirection = Direction.Down;
-            _moving = true;
+            _currentDirectionBeingProcessed = Direction.Down;
+            _currentDirectionActuallyMovingIn = _currentFloor > nextDownFloor ? Direction.Down : Direction.Up;
+        }
+
+        private void ReturnToGroundFloor()
+        {
+            _liftEngineSubscription = Observable.Generate
+                (
+                    _currentFloor,
+                    floor => _currentFloor > GroundFloor
+                        ? HaveWeArrivedAtLowerDestinationYet(floor, GroundFloor)
+                        : HaveWeArrivedAtHigherDestinationYet(floor, GroundFloor),
+                    floor => _currentFloor > GroundFloor
+                        ? NextFloorDown(floor)
+                        : NextFloorUp(floor), // iterator
+                    floor => floor, // actual value
+                    floor => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
+                    _scheduler
+                )
+                .Subscribe
+                (
+                    ArrivedAtFloorOnTheWayToTheGroundFloor
+                );
+
+            _currentDirectionBeingProcessed = Direction.None;
+            _currentDirectionActuallyMovingIn = _currentFloor > GroundFloor ? Direction.Down : Direction.Up;
         }
 
         private void ArrivedAtFloorOnTheWayUp(int floor)
@@ -155,18 +200,36 @@ namespace ElevatorKata01.FunctionalCode
 
             if (floor == NextDownFloor)
             {
+                _currentFloor = floor;
                 Stop();
                 RemoveDownFloorFromDestinations(floor);
             }
+            else
+            {
+                _currentFloor = floor;
+                NotifyObserversOfCurrentStatus();
+            }
+        }
 
-            _currentFloor = floor;
+        private void ArrivedAtFloorOnTheWayToTheGroundFloor(int floor)
+        {
+            // TODO: What if we somehow find ourselves going past the ground floor??
 
-            NotifyObserversOfCurrentStatus();
+            if (floor == GroundFloor)
+            {
+                _currentFloor = floor;
+                Stop();
+            }
+            else
+            {
+                _currentFloor = floor;
+                NotifyObserversOfCurrentStatus();
+            }
         }
 
         private void Stop()
         {
-            _moving = false;
+            _currentDirectionActuallyMovingIn = Direction.None;
             _liftEngineSubscription.Dispose();
             NotifyObserversOfCurrentStatus();
             WaitForNextInstruction();
@@ -211,50 +274,10 @@ namespace ElevatorKata01.FunctionalCode
                 (
                     new LiftStatus
                     {
-                        CurrentDirection = _moving ? _currentDirection : Direction.None,
+                        CurrentDirection = _currentDirectionActuallyMovingIn,
                         CurrentFloor = _currentFloor
                     }
                 );
-            }
-        }
-
-        private bool NotMoving
-        {
-            get
-            {
-                return (_moving == false);
-            }
-        }
-
-        private bool NoUpFloors
-        {
-            get
-            {
-                return !_goingUp.Any();
-            }
-        }
-
-        private bool NoDownFloors
-        {
-            get
-            {
-                return !_goingDown.Any();
-            }
-        }
-
-        private bool UpFloorsWaiting
-        {
-            get
-            {
-                return _goingUp.Any();
-            }
-        }
-
-        private bool DownFloorsWaiting
-        {
-            get
-            {
-                return _goingDown.Any();
             }
         }
 
@@ -268,11 +291,71 @@ namespace ElevatorKata01.FunctionalCode
             _goingDown.Remove(floor);
         }
 
+        private bool HaveWeArrivedAtHigherDestinationYet(int floor, int destinationFloor)
+        {
+            return floor <= destinationFloor;
+        }
+
+        private bool HaveWeArrivedAtLowerDestinationYet(int floor, int destinationFloor)
+        {
+            return floor >= destinationFloor;
+        }
+
+        private int NextFloorDown(int floor)
+        {
+            return floor - 1;
+        }
+
+        private int NextFloorUp(int floor)
+        {
+            return floor + 1;
+        }
+
+        private bool NotMoving
+        {
+            get
+            {
+                return (_currentDirectionActuallyMovingIn == Direction.None);
+            }
+        }
+
+        private bool NoUpFloors
+        {
+            get
+            {
+                return !_goingUp.Any(i => i > _currentFloor);
+            }
+        }
+
+        private bool NoDownFloors
+        {
+            get
+            {
+                return !_goingDown.Any(i => i < _currentFloor);
+            }
+        }
+
+        private bool UpFloorsWaiting
+        {
+            get
+            {
+                return _goingUp.Any(i => i > _currentFloor);
+            }
+        }
+
+        private bool DownFloorsWaiting
+        {
+            get
+            {
+                return _goingDown.Any(i => i < _currentFloor);
+            }
+        }
+
         private void CheckForUpFloors(string itemRequested)
         {
             if (NoUpFloors)
             {
-                throw new Exception(itemRequested + " was requested, but GoingUp is empty");
+                throw new Exception(itemRequested + " was requested, but GoingUp has no more floors above the current floor.");
             }
         }
 
@@ -280,16 +363,7 @@ namespace ElevatorKata01.FunctionalCode
         {
             if (NoDownFloors)
             {
-                throw new Exception(itemRequested + " was requested, but GoingDown is empty");
-            }
-        }
-
-        private int LastUpFloor
-        {
-            get
-            {
-                CheckForUpFloors("LastUpFloor");
-                return _goingUp.Max();
+                throw new Exception(itemRequested + " was requested, but GoingDown has no more floors below the current floor.");
             }
         }
 
@@ -299,15 +373,6 @@ namespace ElevatorKata01.FunctionalCode
             {
                 CheckForUpFloors("NextUpFloor");
                 return _goingUp.Where(i => i > _currentFloor).Min();
-            }
-        }
-
-        private int LastDownFloor
-        {
-            get
-            {
-                CheckForDownFloors("LastDownFloor");
-                return _goingDown.Min();
             }
         }
 

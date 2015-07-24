@@ -73,7 +73,7 @@ namespace ElevatorKata01.Tests
 
             // Act
             theLift.Move(ThirdFloor);
-            testScheduler.Start();
+            testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 5);
 
             // Assert
             Assert.That(_liftStatuses.Count, Is.EqualTo(4));
@@ -121,7 +121,7 @@ namespace ElevatorKata01.Tests
 
             // Act
             theLift.Move(FourthFloor);
-            testScheduler.Start();
+            testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 6);
 
             // Assert
             Assert.That(_liftStatuses.Count, Is.EqualTo(5));
@@ -140,7 +140,7 @@ namespace ElevatorKata01.Tests
 
             // Act
             theLift.Move(FourthFloor);
-            testScheduler.Start();
+            testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 6);
 
             // Assert
             Assert.That(_liftStatuses.Count, Is.GreaterThan(1));
@@ -200,7 +200,7 @@ namespace ElevatorKata01.Tests
 
             // Act
             theLift.CallUp(ThirdFloor);
-            testScheduler.Start();
+            testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 5);
 
             // Assert
             Assert.That(_liftStatuses.Count, Is.EqualTo(4));
@@ -248,7 +248,7 @@ namespace ElevatorKata01.Tests
 
             // Act
             theLift.CallUp(FourthFloor);
-            testScheduler.Start();
+            testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 6);
 
             // Assert
             Assert.That(_liftStatuses.Count, Is.EqualTo(5));
@@ -267,7 +267,7 @@ namespace ElevatorKata01.Tests
 
             // Act
             theLift.CallUp(FourthFloor);
-            testScheduler.Start();
+            testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 6);
 
             // Assert
             Assert.That(_liftStatuses.Count, Is.GreaterThan(1));
@@ -374,8 +374,8 @@ namespace ElevatorKata01.Tests
             Assert.That(_liftStatuses[5].CurrentDirection, Is.EqualTo(Direction.Down));
             Assert.That(_liftStatuses[5].CurrentFloor, Is.EqualTo(FourthFloor));
 
-            Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.None));
-            Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(SecondFloor));
+            Assert.That(_liftStatuses[7].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[7].CurrentFloor, Is.EqualTo(SecondFloor));
         }
 
         [Test]
