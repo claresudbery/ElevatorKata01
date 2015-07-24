@@ -20,6 +20,9 @@ namespace ElevatorKata01.FunctionalCode
         private readonly IScheduler _scheduler;
         private const int GroundFloor = 0;
 
+        private delegate void FloorOperator(int floor);
+        private delegate int FloorReturner();
+
         public ObservableLift(int startingFloor, IScheduler scheduler)
         {
             _currentFloor = startingFloor;
@@ -101,17 +104,15 @@ namespace ElevatorKata01.FunctionalCode
             }
         }
 
-        private void MoveUpwards()
+        private void StartMoving(int nextFloor, Action<int> arrivedAtFloor)
         {
-            int nextUpFloor = NextUpFloor;
-
             _liftEngineSubscription = Observable.Generate
                 (
                     _currentFloor,
-                    floor => _currentFloor < nextUpFloor 
-                        ? HaveWeArrivedAtHigherDestinationYet(floor, nextUpFloor) 
-                        : HaveWeArrivedAtLowerDestinationYet(floor, nextUpFloor),
-                    floor => _currentFloor < nextUpFloor 
+                    floor => _currentFloor < nextFloor
+                        ? HaveWeArrivedAtHigherDestinationYet(floor, nextFloor)
+                        : HaveWeArrivedAtLowerDestinationYet(floor, nextFloor),
+                    floor => _currentFloor < nextFloor
                         ? NextFloorUp(floor)
                         : NextFloorDown(floor), // iterator
                     floor => floor, // actual value
@@ -120,111 +121,70 @@ namespace ElevatorKata01.FunctionalCode
                 )
                 .Subscribe
                 (
-                    ArrivedAtFloorOnTheWayUp
+                    arrivedAtFloor
                 );
 
+            _currentDirectionActuallyMovingIn = _currentFloor < nextFloor ? Direction.Up : Direction.Down;
+        }
+
+        private void MoveUpwards()
+        {
             _currentDirectionBeingProcessed = Direction.Up;
-            _currentDirectionActuallyMovingIn = _currentFloor < nextUpFloor ? Direction.Up : Direction.Down;
+
+            StartMoving(NextUpFloor, ArrivedAtFloorOnTheWayUp);
         }
 
         private void MoveDownwards()
         {
-            int nextDownFloor = NextDownFloor;
-
-            _liftEngineSubscription = Observable.Generate
-                (
-                    _currentFloor,
-                    floor => _currentFloor > nextDownFloor
-                        ? HaveWeArrivedAtLowerDestinationYet(floor, nextDownFloor)
-                        : HaveWeArrivedAtHigherDestinationYet(floor, nextDownFloor),
-                    floor => _currentFloor > nextDownFloor
-                        ? NextFloorDown(floor)
-                        : NextFloorUp(floor), // iterator
-                    floor => floor, // actual value
-                    floor => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
-                    _scheduler
-                )
-                .Subscribe
-                (
-                    ArrivedAtFloorOnTheWayDown
-                );
-
             _currentDirectionBeingProcessed = Direction.Down;
-            _currentDirectionActuallyMovingIn = _currentFloor > nextDownFloor ? Direction.Down : Direction.Up;
+
+            StartMoving(NextDownFloor, ArrivedAtFloorOnTheWayDown);
         }
 
         private void ReturnToGroundFloor()
         {
-            _liftEngineSubscription = Observable.Generate
-                (
-                    _currentFloor,
-                    floor => _currentFloor > GroundFloor
-                        ? HaveWeArrivedAtLowerDestinationYet(floor, GroundFloor)
-                        : HaveWeArrivedAtHigherDestinationYet(floor, GroundFloor),
-                    floor => _currentFloor > GroundFloor
-                        ? NextFloorDown(floor)
-                        : NextFloorUp(floor), // iterator
-                    floor => floor, // actual value
-                    floor => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
-                    _scheduler
-                )
-                .Subscribe
-                (
-                    ArrivedAtFloorOnTheWayToTheGroundFloor
-                );
-
             _currentDirectionBeingProcessed = Direction.None;
-            _currentDirectionActuallyMovingIn = _currentFloor > GroundFloor ? Direction.Down : Direction.Up;
+
+            StartMoving(GroundFloor, ArrivedAtFloorOnTheWayToTheGroundFloor);
+        }
+
+        private void ArrivedAtFloor(
+            int floor,
+            int nextFloor,
+            FloorOperator removeFloorFromDestinations)
+        {
+            if (floor == nextFloor)
+            {
+                _currentFloor = floor;
+                Stop();
+                removeFloorFromDestinations(floor);
+            }
+            else
+            {
+                _currentFloor = floor;
+                NotifyObserversOfCurrentStatus();
+            }
         }
 
         private void ArrivedAtFloorOnTheWayUp(int floor)
         {
             // TODO: What if we somehow find ourselves going up past the top floor??
 
-            if (floor == NextUpFloor)
-            {
-                _currentFloor = floor;
-                Stop();
-                RemoveUpFloorFromDestinations(floor);
-            }
-            else
-            {
-                _currentFloor = floor;
-                NotifyObserversOfCurrentStatus();
-            }
+            ArrivedAtFloor(floor, NextUpFloor, RemoveUpFloorFromDestinations);
         }
 
         private void ArrivedAtFloorOnTheWayDown(int floor)
         {
             // TODO: What if we somehow find ourselves going down past the bottom floor??
 
-            if (floor == NextDownFloor)
-            {
-                _currentFloor = floor;
-                Stop();
-                RemoveDownFloorFromDestinations(floor);
-            }
-            else
-            {
-                _currentFloor = floor;
-                NotifyObserversOfCurrentStatus();
-            }
+            ArrivedAtFloor(floor, NextDownFloor, RemoveDownFloorFromDestinations);
         }
 
         private void ArrivedAtFloorOnTheWayToTheGroundFloor(int floor)
         {
             // TODO: What if we somehow find ourselves going past the ground floor??
 
-            if (floor == GroundFloor)
-            {
-                _currentFloor = floor;
-                Stop();
-            }
-            else
-            {
-                _currentFloor = floor;
-                NotifyObserversOfCurrentStatus();
-            }
+            ArrivedAtFloor(floor, GroundFloor, DoNothing);
         }
 
         private void Stop()
@@ -289,6 +249,11 @@ namespace ElevatorKata01.FunctionalCode
         private void RemoveDownFloorFromDestinations(int floor)
         {
             _goingDown.Remove(floor);
+        }
+
+        private void DoNothing(int floor)
+        {
+            // Do nothing
         }
 
         private bool HaveWeArrivedAtHigherDestinationYet(int floor, int destinationFloor)
