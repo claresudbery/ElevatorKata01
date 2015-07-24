@@ -85,4 +85,6 @@ More sophisticated lift-stopping algorithm:
 		a) somebody tells the lift where they want to go
 		b) a certain amount of time has elapsed
 		
-		
+Possible technologies for a UI (recommended by Braithers):
+	Ruby + Sinatra
+	Angular
