@@ -391,8 +391,8 @@ namespace ElevatorKata01.Tests
         {
             // Arrange
             int betweenFirstAndSecondFloors = (2 * TimeConstants.FloorInterval) + 500;
-            int afterStoppingOnThirdFloor = (8 * TimeConstants.FloorInterval) + 500;
-            int afterStoppingOnSecondFloor = (20 * TimeConstants.FloorInterval) + 500;
+            int afterStoppingOnThirdFloor = (4 * TimeConstants.FloorInterval) + 500;
+            int afterStoppingOnSecondFloor = (18 * TimeConstants.FloorInterval) + 500;
             var testScheduler = new TestScheduler();
             var theLift = new ObservableLift(GroundFloor, testScheduler);
             _liftStatuses.Clear();
@@ -416,6 +416,184 @@ namespace ElevatorKata01.Tests
 
             Assert.That(_liftStatuses[12].CurrentDirection, Is.EqualTo(Direction.None));
             Assert.That(_liftStatuses[12].CurrentFloor, Is.EqualTo(GroundFloor));
+        }
+
+        [Test]
+        public void When_lift_is_above_ground_and_reaches_highest_stop_on_upwards_journey_but_next_downwards_request_is_higher_up_then_it_will_keep_moving_upwards_but_then_come_down()
+        {
+            // Arrange
+            int betweenFirstAndSecondFloors = (2 * TimeConstants.FloorInterval) + 500;
+            int afterStoppingOnThirdFloor = (4 * TimeConstants.FloorInterval) + 500;
+            int afterStoppingOnFifthFloor = (18 * TimeConstants.FloorInterval) + 500;
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.CallUp(ThirdFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallDown(FifthFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.Move(FourthFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnFifthFloor), () => theLift.Move(SecondFloor));
+            testScheduler.Start();
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.GreaterThanOrEqualTo(9));
+
+            Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(FourthFloor));
+
+            Assert.That(_liftStatuses[7].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[7].CurrentFloor, Is.EqualTo(FifthFloor));
+
+            Assert.That(_liftStatuses[8].CurrentDirection, Is.EqualTo(Direction.Down));
+            Assert.That(_liftStatuses[8].CurrentFloor, Is.EqualTo(FifthFloor));
+        }
+
+        [Test]
+        public void When_lift_is_above_ground_and_reaches_highest_stop_on_upwards_journey_and_next_downwards_request_is_lower_down_then_it_will_go_down_to_that_caller_and_then_continue_down()
+        {
+            // Arrange
+            int betweenFirstAndSecondFloors = (2 * TimeConstants.FloorInterval) + 500;
+            int afterStoppingOnThirdFloor = (4 * TimeConstants.FloorInterval) + 500;
+            int afterStoppingOnSecondFloor = (19 * TimeConstants.FloorInterval) + 500;
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.CallUp(ThirdFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallDown(SecondFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.Move(FourthFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnSecondFloor), () => theLift.Move(FirstFloor));
+            testScheduler.Start();
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.GreaterThanOrEqualTo(9));
+
+            Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.Down));
+            Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(FourthFloor));
+
+            Assert.That(_liftStatuses[8].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[8].CurrentFloor, Is.EqualTo(SecondFloor));
+
+            Assert.That(_liftStatuses[9].CurrentDirection, Is.EqualTo(Direction.Down));
+            Assert.That(_liftStatuses[9].CurrentFloor, Is.EqualTo(SecondFloor));
+        }
+
+        [Test]
+        public void When_lift_is_above_ground_and_reaches_highest_stop_on_upwards_journey_and_there_are_no_downwards_requests_then_it_will_return_to_the_ground_floor()
+        {
+            // Arrange
+            int afterStoppingOnThirdFloor = (4 * TimeConstants.FloorInterval) + 500;
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(GroundFloor, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.CallUp(ThirdFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.Move(FourthFloor));
+            testScheduler.Start();
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.EqualTo(11));
+
+            Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.Down));
+            Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(FourthFloor));
+
+            Assert.That(_liftStatuses[10].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[10].CurrentFloor, Is.EqualTo(GroundFloor));
+        }
+
+        [Test]
+        public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_but_next_downwards_request_is_higher_up_then_it_will_keep_moving_upwards_but_then_come_down()
+        {
+            // Arrange
+            int betweenMinusFifthAndMinusFourthFloors = (2 * TimeConstants.FloorInterval) + 500;
+            int afterStoppingOnMinusThirdFloor = (4 * TimeConstants.FloorInterval) + 500;
+            int afterStoppingOnMinusFirstFloor = (18 * TimeConstants.FloorInterval) + 500;
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(-6, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.CallUp(-3);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenMinusFifthAndMinusFourthFloors), () => theLift.CallDown(-1));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusThirdFloor), () => theLift.Move(-2));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusFirstFloor), () => theLift.Move(-4));
+            testScheduler.Start();
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.GreaterThanOrEqualTo(9));
+
+            Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(-2));
+
+            Assert.That(_liftStatuses[7].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[7].CurrentFloor, Is.EqualTo(-1));
+
+            Assert.That(_liftStatuses[8].CurrentDirection, Is.EqualTo(Direction.Down));
+            Assert.That(_liftStatuses[8].CurrentFloor, Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_next_downwards_request_is_lower_down_then_it_will_go_down_to_that_caller_and_then_continue_down()
+        {
+            // Arrange
+            int betweenMinusFifthAndMinusFourthFloors = (2 * TimeConstants.FloorInterval) + 500;
+            int afterStoppingOnMinusThirdFloor = (4 * TimeConstants.FloorInterval) + 500;
+            int afterStoppingOnMinusFifthFloor = (20 * TimeConstants.FloorInterval) + 500;
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(-6, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.CallUp(-3);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenMinusFifthAndMinusFourthFloors), () => theLift.CallDown(-5));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusThirdFloor), () => theLift.Move(-2));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusFifthFloor), () => theLift.Move(-6));
+            testScheduler.Start();
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.GreaterThanOrEqualTo(11));
+
+            Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.Down));
+            Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(-2));
+
+            Assert.That(_liftStatuses[9].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[9].CurrentFloor, Is.EqualTo(-5));
+
+            Assert.That(_liftStatuses[10].CurrentDirection, Is.EqualTo(Direction.Down));
+            Assert.That(_liftStatuses[10].CurrentFloor, Is.EqualTo(-5));
+        }
+
+        [Test]
+        public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_there_are_no_downwards_requests_then_it_will_return_to_the_ground_floor()
+        {
+            // Arrange
+            int afterStoppingOnMinusThirdFloor = (4 * TimeConstants.FloorInterval) + 500;
+            var testScheduler = new TestScheduler();
+            var theLift = new ObservableLift(-6, testScheduler);
+            _liftStatuses.Clear();
+            theLift.Subscribe(this);
+
+            // Act
+            theLift.CallUp(-3);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusThirdFloor), () => theLift.Move(-2));
+            testScheduler.Start();
+
+            // Assert
+            Assert.That(_liftStatuses.Count, Is.EqualTo(9));
+
+            Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.Up));
+            Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(-2));
+
+            Assert.That(_liftStatuses[8].CurrentDirection, Is.EqualTo(Direction.None));
+            Assert.That(_liftStatuses[8].CurrentFloor, Is.EqualTo(GroundFloor));
         }
 
         public void OnNext(LiftStatus currentLiftStatus)

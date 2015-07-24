@@ -129,16 +129,18 @@ namespace ElevatorKata01.FunctionalCode
 
         private void MoveUpwards()
         {
+            bool changedDirection = _currentDirectionBeingProcessed != Direction.Up;
             _currentDirectionBeingProcessed = Direction.Up;
 
-            StartMoving(NextUpFloor, ArrivedAtFloorOnTheWayUp);
+            StartMoving(NextUpFloor(changedDirection), ArrivedAtFloorOnTheWayUp);
         }
 
         private void MoveDownwards()
         {
+            bool changedDirection = _currentDirectionBeingProcessed != Direction.Down;
             _currentDirectionBeingProcessed = Direction.Down;
 
-            StartMoving(NextDownFloor, ArrivedAtFloorOnTheWayDown);
+            StartMoving(NextDownFloor(changedDirection), ArrivedAtFloorOnTheWayDown);
         }
 
         private void ReturnToGroundFloor()
@@ -170,14 +172,18 @@ namespace ElevatorKata01.FunctionalCode
         {
             // TODO: What if we somehow find ourselves going up past the top floor??
 
-            ArrivedAtFloor(floor, NextUpFloor, RemoveUpFloorFromDestinations);
+            bool changedDirection = _currentDirectionActuallyMovingIn != _currentDirectionBeingProcessed;
+
+            ArrivedAtFloor(floor, NextUpFloor(changedDirection), RemoveUpFloorFromDestinations);
         }
 
         private void ArrivedAtFloorOnTheWayDown(int floor)
         {
             // TODO: What if we somehow find ourselves going down past the bottom floor??
 
-            ArrivedAtFloor(floor, NextDownFloor, RemoveDownFloorFromDestinations);
+            bool changedDirection = _currentDirectionActuallyMovingIn != _currentDirectionBeingProcessed;
+
+            ArrivedAtFloor(floor, NextDownFloor(changedDirection), RemoveDownFloorFromDestinations);
         }
 
         private void ArrivedAtFloorOnTheWayToTheGroundFloor(int floor)
@@ -284,27 +290,21 @@ namespace ElevatorKata01.FunctionalCode
             }
         }
 
-        private bool NoUpFloors
+        private bool NoUpFloors(bool changedDirection)
         {
-            get
-            {
-                return !_goingUp.Any(i => i > _currentFloor);
-            }
+            return !_goingUp.Any(i => i >= _currentFloor || changedDirection);
         }
 
-        private bool NoDownFloors
+        private bool NoDownFloors(bool changedDirection)
         {
-            get
-            {
-                return !_goingDown.Any(i => i < _currentFloor);
-            }
+            return !_goingDown.Any(i => i <= _currentFloor || changedDirection);
         }
 
         private bool UpFloorsWaiting
         {
             get
             {
-                return _goingUp.Any(i => i > _currentFloor);
+                return _goingUp.Any();
             }
         }
 
@@ -312,42 +312,36 @@ namespace ElevatorKata01.FunctionalCode
         {
             get
             {
-                return _goingDown.Any(i => i < _currentFloor);
+                return _goingDown.Any();
             }
         }
 
-        private void CheckForUpFloors(string itemRequested)
+        private void CheckForUpFloors(string itemRequested, bool changedDirection)
         {
-            if (NoUpFloors)
+            if (NoUpFloors(changedDirection))
             {
-                throw new Exception(itemRequested + " was requested, but GoingUp has no more floors above the current floor.");
+                throw new Exception(itemRequested + " was requested, but GoingUp has no more floors in the relevant range.");
             }
         }
 
-        private void CheckForDownFloors(string itemRequested)
+        private void CheckForDownFloors(string itemRequested, bool changedDirection)
         {
-            if (NoDownFloors)
+            if (NoDownFloors(changedDirection))
             {
-                throw new Exception(itemRequested + " was requested, but GoingDown has no more floors below the current floor.");
+                throw new Exception(itemRequested + " was requested, but GoingDown has no more floors in the relevant range.");
             }
         }
 
-        private int NextUpFloor
+        private int NextUpFloor(bool changedDirection)
         {
-            get
-            {
-                CheckForUpFloors("NextUpFloor");
-                return _goingUp.Where(i => i > _currentFloor).Min();
-            }
+            CheckForUpFloors("NextUpFloor", changedDirection);
+            return _goingUp.Where(i => i >= _currentFloor || changedDirection).Min();
         }
 
-        private int NextDownFloor
+        private int NextDownFloor(bool changedDirection)
         {
-            get
-            {
-                CheckForDownFloors("NextDownFloor");
-                return _goingDown.Where(i => i < _currentFloor).Max();
-            }
+            CheckForDownFloors("NextDownFloor", changedDirection);
+            return _goingDown.Where(i => i <= _currentFloor || changedDirection).Max();
         }
     }
 }

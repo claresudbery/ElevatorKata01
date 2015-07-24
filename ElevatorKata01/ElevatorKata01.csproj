@@ -78,7 +78,6 @@
   <ItemGroup>
     <Compile Include="Elements\LiftCall.cs" />
     <Compile Include="Elements\ILiftMonitor.cs" />
-    <Compile Include="Spares\LiftSpares.cs" />
     <Compile Include="Elements\LiftStatus.cs" />
     <Compile Include="Elements\Direction.cs" />
     <Compile Include="Tests\ElevatorTests.cs" />
