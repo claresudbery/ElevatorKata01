@@ -39,6 +39,28 @@ I need to add some notes here about how the TestScheduler class works, because i
 - When you pass a scheduler to an Observable.Generate call, this has the effect of scheduling the relevant events
 	-- so a subsequent call to Start or AdvanceBy will run the scheduled events up to the specified point
 	-- but they won't be run until Start or AdvanceBy or AdvanceTo are called
+	
+A note on the test helpers:
+The following methods are used to make the tests easier to write and easier to read:
+	LiftStartAt
+	LiftLeaveFrom
+	LiftVisit
+	LiftStopAt
+	LiftMakeUpwardsRequestFrom
+	LiftMakeDownwardsRequestFrom
+	LiftRequestMoveTo
+	StartTest
+	Mark
+	VerifyAllMarkers
+The reason these methods exist is that otherwise, you have to keep careful track of...
+	exactly what events you expect to occur
+	exactly how many events you expect to occur
+	exactly what time you expect each event to occur (so that you can insert lift moves and calls in the correct places)
+By using the new methods, you don't have to count events or keep track of time - the methods do that for you.
+Then you use the Mark method to make a note of which events you want to verify, 
+	and call VerifyAllMarkers to make the relevant assertions at the end of the test.
+	The fact that you explicitly call LiftVisit, LiftStop etc means that there is a clear visible record of what you expect the lift to do.
+	This has significantly reduced the quantity of pain in my head whilst writing these tests!
 
 Note that the basic algorithm being used at this point is pretty simple:
 	- When the lift is idle, the first person to make a request defines the current direction of lift movement
@@ -112,6 +134,11 @@ More sophisticated lift-stopping algorithm:
 		b) a certain amount of time has elapsed
 If the lift is called down to a negative floor, if no requests are made then it should return back up to the ground floor.
 		
-Possible technologies for a UI (recommended by Braithers):
-	Ruby + Sinatra
-	Angular
+Possible technologies for a UI: 
+	recommended by Braithers:
+		Ruby + Sinatra
+		Angular
+		Node.js
+	recommended by Google:
+		Xamarin (based on my own quick Googling re what I could use to generate an app for Android and iOS, but using languages / technologies I already know (ie C# and Visual Studio))
+			Details here: http://nnish.com/2013/06/12/how-i-built-an-android-app-in-c-visual-studio-in-less-than-24hrs/
