@@ -215,7 +215,7 @@ namespace ElevatorKata01.FunctionalCode
                     i => i <= 1,
                     i => i + 1, // iterator
                     i => i, // actual value
-                    i => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval * 5),
+                    i => TimeSpan.FromMilliseconds(TimeConstants.WaitTime),
                     _scheduler
                 )
                 .Subscribe
