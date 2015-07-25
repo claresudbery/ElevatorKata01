@@ -514,7 +514,7 @@ namespace ElevatorKata01.Tests
             Assert.That(_liftStatuses[10].CurrentDirection, Is.EqualTo(Direction.None));
             Assert.That(_liftStatuses[10].CurrentFloor, Is.EqualTo(GroundFloor));
         }
-
+        
         [Test]
         public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_but_next_downwards_request_is_higher_up_then_it_will_keep_moving_upwards_but_then_come_down()
         {
@@ -551,33 +551,33 @@ namespace ElevatorKata01.Tests
         public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_next_downwards_request_is_lower_down_then_it_will_go_down_to_that_caller_and_then_continue_down()
         {
             // Arrange
-            LiftStartAt(-6);
+            LiftExpectToStartAt(-6);
 
             // Act
             _theLift.MakeUpwardsRequestFrom(-3);
 
-            LiftLeaveFrom(-6);
-            LiftVisit(-5);
+            LiftExpectToLeaveFrom(-6);
+            LiftExpectToVisit(-5);
             
             LiftMakeDownwardsRequestFrom(-5);
 
-            LiftVisit(-4);
-            LiftStopAt(-3);
+            LiftExpectToVisit(-4);
+            LiftExpectToStopAt(-3);
 
-            LiftRequestMoveTo(-2);
+            LiftMakeRequestToMoveTo(-2);
 
-            LiftLeaveFrom(-3);
-            LiftStopAt(-2);
+            LiftExpectToLeaveFrom(-3);
+            LiftExpectToStopAt(-2);
 
-            LiftLeaveFrom(-2).Mark(Direction.Down);
-            LiftVisit(-3);
-            LiftVisit(-4);
-            LiftStopAt(-5).Mark(Direction.None);
+            LiftExpectToLeaveFrom(-2).Mark(Direction.Down);
+            LiftExpectToVisit(-3);
+            LiftExpectToVisit(-4);
+            LiftExpectToStopAt(-5).Mark(Direction.None);
 
-            LiftRequestMoveTo(-6);
+            LiftMakeRequestToMoveTo(-6);
 
-            LiftLeaveFrom(-5).Mark(Direction.Down);
-            LiftStopAt(-6);
+            LiftExpectToLeaveFrom(-5).Mark(Direction.Down);
+            LiftExpectToStopAt(-6);
 
             StartTest();
 
@@ -589,24 +589,24 @@ namespace ElevatorKata01.Tests
         public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_there_are_no_downwards_requests_then_it_will_return_to_the_ground_floor()
         {
             // Arrange
-            LiftStartAt(-6);
+            LiftExpectToStartAt(-6);
  
             // Act
             _theLift.MakeUpwardsRequestFrom(-3);
 
-            LiftLeaveFrom(-6);
-            LiftVisit(-5);
-            LiftVisit(-4);
-            LiftStopAt(-3);
+            LiftExpectToLeaveFrom(-6);
+            LiftExpectToVisit(-5);
+            LiftExpectToVisit(-4);
+            LiftExpectToStopAt(-3);
 
-            LiftRequestMoveTo(-2);
+            LiftMakeRequestToMoveTo(-2);
 
-            LiftLeaveFrom(-3);
-            LiftStopAt(-2);
+            LiftExpectToLeaveFrom(-3);
+            LiftExpectToStopAt(-2);
 
-            LiftLeaveFrom(-2).Mark(Direction.Up);
-            LiftVisit(-1);
-            LiftStopAt(GroundFloor).Mark(Direction.None);
+            LiftExpectToLeaveFrom(-2).Mark(Direction.Up);
+            LiftExpectToVisit(-1);
+            LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
             
             StartTest();
             
@@ -651,7 +651,7 @@ namespace ElevatorKata01.Tests
             _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted).Ticks);
         }
 
-        private void LiftRequestMoveTo(int floor)
+        private void LiftMakeRequestToMoveTo(int floor)
         {
             _testScheduler.Schedule(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + 500), () => _theLift.MoveTo(floor));
         }
@@ -666,7 +666,7 @@ namespace ElevatorKata01.Tests
             _testScheduler.Schedule(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + 500), () => _theLift.MakeUpwardsRequestFrom(floor));
         }
 
-        private ElevatorTests LiftStopAt(int floor)
+        private ElevatorTests LiftExpectToStopAt(int floor)
         {
             _millisecondsSinceTestStarted += TimeConstants.WaitTime;
             _numExpectedStatuses++;
@@ -674,12 +674,12 @@ namespace ElevatorKata01.Tests
             return this;
         }
 
-        private ElevatorTests LiftLeaveFrom(int floor)
+        private ElevatorTests LiftExpectToLeaveFrom(int floor)
         {
-            return LiftVisit(floor);
+            return LiftExpectToVisit(floor);
         }
 
-        private ElevatorTests LiftVisit(int floor)
+        private ElevatorTests LiftExpectToVisit(int floor)
         {
             _millisecondsSinceTestStarted += TimeConstants.FloorInterval;
             _numExpectedStatuses++;
@@ -687,7 +687,7 @@ namespace ElevatorKata01.Tests
             return this;
         }
 
-        private void LiftStartAt(int floor)
+        private void LiftExpectToStartAt(int floor)
         {
             _liftStatuses.Clear();
             _expectedLiftStatuses.Clear();

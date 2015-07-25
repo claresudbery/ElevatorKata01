@@ -42,13 +42,13 @@ I need to add some notes here about how the TestScheduler class works, because i
 	
 A note on the test helpers:
 The following methods are used to make the tests easier to write and easier to read:
-	LiftStartAt
-	LiftLeaveFrom
-	LiftVisit
-	LiftStopAt
+	LiftExpectToStartAt
+	LiftExpectToLeaveFrom
+	LiftExpectToVisit
+	LiftExpectToStopAt
 	LiftMakeUpwardsRequestFrom
 	LiftMakeDownwardsRequestFrom
-	LiftRequestMoveTo
+	LiftMakeRequestToMoveTo
 	StartTest
 	Mark
 	VerifyAllMarkers
@@ -57,9 +57,18 @@ The reason these methods exist is that otherwise, you have to keep careful track
 	exactly how many events you expect to occur
 	exactly what time you expect each event to occur (so that you can insert lift moves and calls in the correct places)
 By using the new methods, you don't have to count events or keep track of time - the methods do that for you.
+	Note that most of the methods are not actually making anything happen
+	- they are just making a note of what we expect to happen, 
+	and allowing us to make a note of the time and the order in which these events should happen.
+	Thus there are two types of method:
+		Those prefixed LiftExpectTo, which note expectations and at what time / in what order each expected event will happen
+		Those prefixed LiftMake, which actually call methods on the lift itself
+	However you can't have one without the other, because the LiftMake methods use the scheduler
+		...and in order to use the scheduler, you need to know at what time you want the lift to be called
+	Also, you need the LiftExpectTo methods to have noted the order of events so that you can verify expectations later on.
 Then you use the Mark method to make a note of which events you want to verify, 
 	and call VerifyAllMarkers to make the relevant assertions at the end of the test.
-	The fact that you explicitly call LiftVisit, LiftStop etc means that there is a clear visible record of what you expect the lift to do.
+	The fact that you explicitly call LiftExpectToVisit, LiftExpectToStop etc means that there is a clear visible record of what you expect the lift to do.
 	This has significantly reduced the quantity of pain in my head whilst writing these tests!
 
 Note that the basic algorithm being used at this point is pretty simple:
