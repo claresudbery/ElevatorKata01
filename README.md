@@ -42,7 +42,7 @@ I need to add some notes here about how the TestScheduler class works, because i
 	
 A note on the test helpers:
 The following methods are used to make the tests easier to write and easier to read:
-	LiftExpectToStartAt
+	LiftMakeStartAt
 	LiftExpectToLeaveFrom
 	LiftExpectToVisit
 	LiftExpectToStopAt

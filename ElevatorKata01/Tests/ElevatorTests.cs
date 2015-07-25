@@ -526,6 +526,7 @@ namespace ElevatorKata01.Tests
             var theLift = new ObservableLift(-6, testScheduler);
             _liftStatuses.Clear();
             theLift.Subscribe(this);
+            LiftMakeStartAt(-6);
 
             // Act
             theLift.MakeUpwardsRequestFrom(-3);
@@ -551,7 +552,7 @@ namespace ElevatorKata01.Tests
         public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_next_downwards_request_is_lower_down_then_it_will_go_down_to_that_caller_and_then_continue_down()
         {
             // Arrange
-            LiftExpectToStartAt(-6);
+            LiftMakeStartAt(-6);
 
             // Act
             _theLift.MakeUpwardsRequestFrom(-3);
@@ -584,12 +585,12 @@ namespace ElevatorKata01.Tests
             // Assert
             VerifyAllMarkers();
         }
-
+        
         [Test]
         public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_there_are_no_downwards_requests_then_it_will_return_to_the_ground_floor()
         {
             // Arrange
-            LiftExpectToStartAt(-6);
+            LiftMakeStartAt(-6);
  
             // Act
             _theLift.MakeUpwardsRequestFrom(-3);
@@ -687,7 +688,7 @@ namespace ElevatorKata01.Tests
             return this;
         }
 
-        private void LiftExpectToStartAt(int floor)
+        private void LiftMakeStartAt(int floor)
         {
             _liftStatuses.Clear();
             _expectedLiftStatuses.Clear();
