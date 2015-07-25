@@ -40,7 +40,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Move(ThirdFloor);
+            theLift.MoveTo(ThirdFloor);
             testScheduler.Start();
 
             // Assert
@@ -60,7 +60,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Move(FirstFloor);
+            theLift.MoveTo(FirstFloor);
             testScheduler.Start();
 
             // Assert
@@ -80,7 +80,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Move(ThirdFloor);
+            theLift.MoveTo(ThirdFloor);
             testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 5);
 
             // Assert
@@ -109,7 +109,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Move(FirstFloor);
+            theLift.MoveTo(FirstFloor);
             testScheduler.Start();
 
             // Assert
@@ -128,7 +128,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Move(FourthFloor);
+            theLift.MoveTo(FourthFloor);
             testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 6);
 
             // Assert
@@ -147,7 +147,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.Move(FourthFloor);
+            theLift.MoveTo(FourthFloor);
             testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 6);
 
             // Assert
@@ -167,7 +167,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(ThirdFloor);
+            theLift.MakeUpwardsRequestFrom(ThirdFloor);
             testScheduler.Start();
 
             // Assert
@@ -187,7 +187,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallDown(FirstFloor);
+            theLift.MakeDownwardsRequestFrom(FirstFloor);
             testScheduler.Start();
 
             // Assert
@@ -207,7 +207,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(ThirdFloor);
+            theLift.MakeUpwardsRequestFrom(ThirdFloor);
             testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 5);
 
             // Assert
@@ -236,7 +236,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(FirstFloor);
+            theLift.MakeUpwardsRequestFrom(FirstFloor);
             testScheduler.Start();
 
             // Assert
@@ -255,7 +255,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(FourthFloor);
+            theLift.MakeUpwardsRequestFrom(FourthFloor);
             testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 6);
 
             // Assert
@@ -274,7 +274,7 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(FourthFloor);
+            theLift.MakeUpwardsRequestFrom(FourthFloor);
             testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(TimeConstants.FloorInterval).Ticks * 6);
 
             // Assert
@@ -295,8 +295,8 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(FourthFloor);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallUp(SecondFloor));
+            theLift.MakeUpwardsRequestFrom(FourthFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.MakeUpwardsRequestFrom(SecondFloor));
             testScheduler.Start();
 
             // Assert
@@ -317,8 +317,8 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(FourthFloor);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallDown(SecondFloor));
+            theLift.MakeUpwardsRequestFrom(FourthFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.MakeDownwardsRequestFrom(SecondFloor));
             testScheduler.Start();
 
             // Assert
@@ -340,9 +340,9 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(FourthFloor);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallUp(SecondFloor));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterSecondFloor), () => theLift.Move(GroundFloor));
+            theLift.MakeUpwardsRequestFrom(FourthFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.MakeUpwardsRequestFrom(SecondFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterSecondFloor), () => theLift.MoveTo(GroundFloor));
             testScheduler.Start();
 
             // Assert
@@ -370,9 +370,9 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(ThirdFloor);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallDown(SecondFloor));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.Move(FourthFloor));
+            theLift.MakeUpwardsRequestFrom(ThirdFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.MakeDownwardsRequestFrom(SecondFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.MoveTo(FourthFloor));
             testScheduler.Start();
 
             // Assert
@@ -407,10 +407,10 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(ThirdFloor);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallDown(SecondFloor));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.Move(FourthFloor));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnSecondFloor), () => theLift.Move(FirstFloor));
+            theLift.MakeUpwardsRequestFrom(ThirdFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.MakeDownwardsRequestFrom(SecondFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.MoveTo(FourthFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnSecondFloor), () => theLift.MoveTo(FirstFloor));
             testScheduler.Start();
 
             // Assert
@@ -439,10 +439,10 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(ThirdFloor);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallDown(FifthFloor));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.Move(FourthFloor));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnFifthFloor), () => theLift.Move(SecondFloor));
+            theLift.MakeUpwardsRequestFrom(ThirdFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.MakeDownwardsRequestFrom(FifthFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.MoveTo(FourthFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnFifthFloor), () => theLift.MoveTo(SecondFloor));
             testScheduler.Start();
 
             // Assert
@@ -471,10 +471,10 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(ThirdFloor);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.CallDown(SecondFloor));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.Move(FourthFloor));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnSecondFloor), () => theLift.Move(FirstFloor));
+            theLift.MakeUpwardsRequestFrom(ThirdFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenFirstAndSecondFloors), () => theLift.MakeDownwardsRequestFrom(SecondFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.MoveTo(FourthFloor));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnSecondFloor), () => theLift.MoveTo(FirstFloor));
             testScheduler.Start();
 
             // Assert
@@ -501,8 +501,8 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(ThirdFloor);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.Move(FourthFloor));
+            theLift.MakeUpwardsRequestFrom(ThirdFloor);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.MoveTo(FourthFloor));
             testScheduler.Start();
 
             // Assert
@@ -528,10 +528,10 @@ namespace ElevatorKata01.Tests
             theLift.Subscribe(this);
 
             // Act
-            theLift.CallUp(-3);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenMinusFifthAndMinusFourthFloors), () => theLift.CallDown(-1));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusThirdFloor), () => theLift.Move(-2));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusFirstFloor), () => theLift.Move(-4));
+            theLift.MakeUpwardsRequestFrom(-3);
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenMinusFifthAndMinusFourthFloors), () => theLift.MakeDownwardsRequestFrom(-1));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusThirdFloor), () => theLift.MoveTo(-2));
+            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusFirstFloor), () => theLift.MoveTo(-4));
             testScheduler.Start();
 
             // Assert
@@ -551,59 +551,65 @@ namespace ElevatorKata01.Tests
         public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_next_downwards_request_is_lower_down_then_it_will_go_down_to_that_caller_and_then_continue_down()
         {
             // Arrange
-            int betweenMinusFifthAndMinusFourthFloors = (2 * TimeConstants.FloorInterval) + 500;
-            int afterStoppingOnMinusThirdFloor = (4 * TimeConstants.FloorInterval) + 500;
-            int afterStoppingOnMinusFifthFloor = (20 * TimeConstants.FloorInterval) + 500;
-            var testScheduler = new TestScheduler();
-            var theLift = new ObservableLift(-6, testScheduler);
-            _liftStatuses.Clear();
-            theLift.Subscribe(this);
+            LiftStartAt(-6);
 
             // Act
-            theLift.CallUp(-3);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenMinusFifthAndMinusFourthFloors), () => theLift.CallDown(-5));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusThirdFloor), () => theLift.Move(-2));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusFifthFloor), () => theLift.Move(-6));
-            testScheduler.Start();
+            _theLift.MakeUpwardsRequestFrom(-3);
+
+            LiftLeaveFrom(-6);
+            LiftVisit(-5);
+            
+            LiftMakeDownwardsRequestFrom(-5);
+
+            LiftVisit(-4);
+            LiftStopAt(-3);
+
+            LiftRequestMoveTo(-2);
+
+            LiftLeaveFrom(-3);
+            LiftStopAt(-2);
+
+            LiftLeaveFrom(-2).Mark(Direction.Down);
+            LiftVisit(-3);
+            LiftVisit(-4);
+            LiftStopAt(-5).Mark(Direction.None);
+
+            LiftRequestMoveTo(-6);
+
+            LiftLeaveFrom(-5).Mark(Direction.Down);
+            LiftStopAt(-6);
+
+            StartTest();
 
             // Assert
-            Assert.That(_liftStatuses.Count, Is.GreaterThanOrEqualTo(11));
-
-            Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.Down));
-            Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(-2));
-
-            Assert.That(_liftStatuses[9].CurrentDirection, Is.EqualTo(Direction.None));
-            Assert.That(_liftStatuses[9].CurrentFloor, Is.EqualTo(-5));
-
-            Assert.That(_liftStatuses[10].CurrentDirection, Is.EqualTo(Direction.Down));
-            Assert.That(_liftStatuses[10].CurrentFloor, Is.EqualTo(-5));
+            VerifyAllMarkers();
         }
 
         [Test]
         public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_there_are_no_downwards_requests_then_it_will_return_to_the_ground_floor()
         {
             // Arrange
-            LiftStart(-6);
+            LiftStartAt(-6);
  
             // Act
-            _theLift.CallUp(-3);
+            _theLift.MakeUpwardsRequestFrom(-3);
 
-            LiftVisit(-6);
+            LiftLeaveFrom(-6);
             LiftVisit(-5);
             LiftVisit(-4);
-            LiftStop(-3);
+            LiftStopAt(-3);
 
-            LiftMove(-2);
+            LiftRequestMoveTo(-2);
 
-            LiftVisit(-3);
-            LiftStop(-2);
+            LiftLeaveFrom(-3);
+            LiftStopAt(-2);
 
-            LiftVisit(-2).Mark(Direction.Up);
+            LiftLeaveFrom(-2).Mark(Direction.Up);
             LiftVisit(-1);
-            LiftStop(GroundFloor).Mark(Direction.None);
+            LiftStopAt(GroundFloor).Mark(Direction.None);
             
             StartTest();
-
+            
             // Assert
             VerifyAllMarkers();
         }
@@ -617,6 +623,14 @@ namespace ElevatorKata01.Tests
                 Assert.That(_liftStatuses[expectedStatus.StatusIndex].CurrentDirection, Is.EqualTo(expectedStatus.Status.CurrentDirection));
                 Assert.That(_liftStatuses[expectedStatus.StatusIndex].CurrentFloor, Is.EqualTo(expectedStatus.Status.CurrentFloor));
             }
+
+            _theLift.Dispose();
+            EnsureThatAllScheduledEventsAreRunThroughToCompletion();
+        }
+
+        private void EnsureThatAllScheduledEventsAreRunThroughToCompletion()
+        {
+            _testScheduler.Start();
         }
 
         private void Mark(Direction direction)
@@ -634,20 +648,35 @@ namespace ElevatorKata01.Tests
 
         private void StartTest()
         {
-            _testScheduler.Start();
+            _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted).Ticks);
         }
 
-        private void LiftMove(int floor)
+        private void LiftRequestMoveTo(int floor)
         {
-            _testScheduler.Schedule(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted), () => _theLift.Move(floor));
+            _testScheduler.Schedule(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + 500), () => _theLift.MoveTo(floor));
         }
 
-        private ElevatorTests LiftStop(int floor)
+        private void LiftMakeDownwardsRequestFrom(int floor)
+        {
+            _testScheduler.Schedule(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + 500), () => _theLift.MakeDownwardsRequestFrom(floor));
+        }
+
+        private void LiftMakeUpwardsRequestFrom(int floor)
+        {
+            _testScheduler.Schedule(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + 500), () => _theLift.MakeUpwardsRequestFrom(floor));
+        }
+
+        private ElevatorTests LiftStopAt(int floor)
         {
             _millisecondsSinceTestStarted += TimeConstants.WaitTime;
             _numExpectedStatuses++;
             _currentLiftFloor = floor;
             return this;
+        }
+
+        private ElevatorTests LiftLeaveFrom(int floor)
+        {
+            return LiftVisit(floor);
         }
 
         private ElevatorTests LiftVisit(int floor)
@@ -658,7 +687,7 @@ namespace ElevatorKata01.Tests
             return this;
         }
 
-        private void LiftStart(int floor)
+        private void LiftStartAt(int floor)
         {
             _liftStatuses.Clear();
             _expectedLiftStatuses.Clear();

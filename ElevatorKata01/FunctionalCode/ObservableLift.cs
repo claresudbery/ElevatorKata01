@@ -46,7 +46,7 @@ namespace ElevatorKata01.FunctionalCode
             }
         }
 
-        public void Move(int destinationFloor)
+        public void MoveTo(int destinationFloor)
         {
             if (destinationFloor > _currentFloor)
             {
@@ -58,12 +58,12 @@ namespace ElevatorKata01.FunctionalCode
             }
         }
 
-        public void CallUp(int destinationFloor)
+        public void MakeUpwardsRequestFrom(int destinationFloor)
         {
             ProcessUpwardsMoveRequest(destinationFloor);
         }
 
-        public void CallDown(int destinationFloor)
+        public void MakeDownwardsRequestFrom(int destinationFloor)
         {
             ProcessDownwardsMoveRequest(destinationFloor);
         }
