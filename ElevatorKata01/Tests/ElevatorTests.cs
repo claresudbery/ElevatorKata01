@@ -22,9 +22,9 @@ namespace ElevatorKata01.Tests
             //LiftExpectToLeaveFrom(xx);
             //LiftExpectToVisit(xx);
             //LiftExpectToStopAt(xx);
-            //LiftMakeRequestToMoveTo(xx);
-            //LiftMakeUpwardsRequestFrom(xx);
-            //LiftMakeDownwardsRequestFrom(xx);
+            //LiftMakeRequestToMoveTo(xx, shouldBeActedUponImmediately: true);
+            //LiftMakeUpwardsRequestFrom(xx, shouldBeActedUponImmediately: true);
+            //LiftMakeDownwardsRequestFrom(xx, shouldBeActedUponImmediately: true);
 
             //StartTest();
 
@@ -48,6 +48,7 @@ namespace ElevatorKata01.Tests
         private int _millisecondsTakenByMostRecentEvent;
         private int _numExpectedStatuses;
         private int _currentLiftFloor;
+        private bool _testStarted = false;
 
         [Test]
         public void When_person_in_lift_enters_a_higher_floor_number_then_lift_starts_moving_upwards()
@@ -513,25 +514,31 @@ namespace ElevatorKata01.Tests
         public void When_lift_is_above_ground_and_reaches_highest_stop_on_upwards_journey_and_there_are_no_downwards_requests_then_it_will_return_to_the_ground_floor()
         {
             // Arrange
-            int afterStoppingOnThirdFloor = (4 * TimeConstants.FloorInterval) + 500;
-            var testScheduler = new TestScheduler();
-            var theLift = new ObservableLift(GroundFloor, testScheduler);
-            _liftStatuses.Clear();
-            theLift.Subscribe(this);
+            LiftMakeStartAt(GroundFloor);
 
             // Act
-            theLift.MakeUpwardsRequestFrom(ThirdFloor);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnThirdFloor), () => theLift.MoveTo(FourthFloor));
-            testScheduler.Start();
+            _theLift.MakeUpwardsRequestFrom(ThirdFloor);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(FirstFloor);
+            LiftExpectToVisit(SecondFloor);
+            LiftExpectToStopAt(ThirdFloor);
+
+            LiftMakeRequestToMoveTo(FourthFloor, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(ThirdFloor);
+            LiftExpectToStopAt(FourthFloor);
+
+            LiftExpectToLeaveFrom(FourthFloor).Mark(Direction.Down);
+            LiftExpectToVisit(ThirdFloor);
+            LiftExpectToVisit(SecondFloor);
+            LiftExpectToVisit(FirstFloor);
+            LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
+
+            StartTest();
 
             // Assert
-            Assert.That(_liftStatuses.Count, Is.EqualTo(11));
-
-            Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.Down));
-            Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(FourthFloor));
-
-            Assert.That(_liftStatuses[10].CurrentDirection, Is.EqualTo(Direction.None));
-            Assert.That(_liftStatuses[10].CurrentFloor, Is.EqualTo(GroundFloor));
+            VerifyAllMarkers();
         }
         
         [Test]
@@ -629,15 +636,16 @@ namespace ElevatorKata01.Tests
             LiftExpectToLeaveFrom(-2).Mark(Direction.Up);
             LiftExpectToVisit(-1);
             LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
-            
+
             StartTest();
             
             // Assert
             VerifyAllMarkers();
         }
-
+        
         private void VerifyAllMarkers()
         {
+            Assert.That(_testStarted, Is.EqualTo(true), "Test scheduler was never kicked off!");
             Assert.That(_liftStatuses.Count, Is.EqualTo(_numExpectedStatuses));
 
             foreach (var expectedStatus in _expectedLiftStatuses)
@@ -648,8 +656,9 @@ namespace ElevatorKata01.Tests
 
             _theLift.Dispose();
             EnsureThatAllScheduledEventsAreRunThroughToCompletion();
+            _testStarted = false;
         }
-
+        
         private void EnsureThatAllScheduledEventsAreRunThroughToCompletion()
         {
             _testScheduler.Start();
@@ -671,6 +680,7 @@ namespace ElevatorKata01.Tests
 
         private void StartTest()
         {
+            _testStarted = true;
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
 
             _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted).Ticks);
