@@ -241,7 +241,8 @@ namespace ElevatorKata01.FunctionalCode
                     new LiftStatus
                     {
                         CurrentDirection = _currentDirectionActuallyMovingIn,
-                        CurrentFloor = _currentFloor
+                        CurrentFloor = _currentFloor,
+                        Timestamp = _scheduler.Now.TimeOfDay
                     }
                 );
             }

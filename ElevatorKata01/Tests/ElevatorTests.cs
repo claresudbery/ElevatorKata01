@@ -546,12 +546,12 @@ namespace ElevatorKata01.Tests
             LiftExpectToLeaveFrom(-6);
             LiftExpectToVisit(-5);
 
-            LiftMakeDownwardsRequestFrom(-1);
+            LiftMakeDownwardsRequestFrom(-1, shouldBeActedUponImmediately:false);
 
             LiftExpectToVisit(-4);
             LiftExpectToStopAt(-3);
 
-            LiftMakeRequestToMoveTo(-2);
+            LiftMakeRequestToMoveTo(-2, shouldBeActedUponImmediately: true);
 
             LiftExpectToLeaveFrom(-3);
             LiftExpectToStopAt(-2);
@@ -559,7 +559,7 @@ namespace ElevatorKata01.Tests
             LiftExpectToLeaveFrom(-2).Mark(Direction.Up);
             LiftExpectToStopAt(-1).Mark(Direction.None);
 
-            LiftMakeRequestToMoveTo(-4);
+            LiftMakeRequestToMoveTo(-4, shouldBeActedUponImmediately: true);
             
             LiftExpectToLeaveFrom(-1).Mark(Direction.Down);
 
@@ -580,13 +580,13 @@ namespace ElevatorKata01.Tests
 
             LiftExpectToLeaveFrom(-6);
             LiftExpectToVisit(-5);
-            
-            LiftMakeDownwardsRequestFrom(-5);
+
+            LiftMakeDownwardsRequestFrom(-5, shouldBeActedUponImmediately: false);
 
             LiftExpectToVisit(-4);
             LiftExpectToStopAt(-3);
 
-            LiftMakeRequestToMoveTo(-2);
+            LiftMakeRequestToMoveTo(-2, shouldBeActedUponImmediately: true);
 
             LiftExpectToLeaveFrom(-3);
             LiftExpectToStopAt(-2);
@@ -596,7 +596,7 @@ namespace ElevatorKata01.Tests
             LiftExpectToVisit(-4);
             LiftExpectToStopAt(-5).Mark(Direction.None);
 
-            LiftMakeRequestToMoveTo(-6);
+            LiftMakeRequestToMoveTo(-6, shouldBeActedUponImmediately: true);
 
             LiftExpectToLeaveFrom(-5).Mark(Direction.Down);
             LiftExpectToStopAt(-6);
@@ -621,7 +621,7 @@ namespace ElevatorKata01.Tests
             LiftExpectToVisit(-4);
             LiftExpectToStopAt(-3);
 
-            LiftMakeRequestToMoveTo(-2);
+            LiftMakeRequestToMoveTo(-2, shouldBeActedUponImmediately: true);
 
             LiftExpectToLeaveFrom(-3);
             LiftExpectToStopAt(-2);
@@ -660,6 +660,7 @@ namespace ElevatorKata01.Tests
             _expectedLiftStatuses.Add(new ExpectedLiftStatus
             {
                 StatusIndex = _numExpectedStatuses - 1,
+                SecondsSinceTestStarted = _millisecondsSinceTestStarted / 1000m,
                 Status = new LiftStatus
                 {
                     CurrentDirection = direction,
@@ -675,25 +676,44 @@ namespace ElevatorKata01.Tests
             _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted).Ticks);
         }
 
-        private void LiftMakeRequestToMoveTo(int floor)
+        private void LiftMakeRequestToMoveTo(int floor, bool shouldBeActedUponImmediately)
         {
-            _testScheduler.Schedule(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + 500), () => _theLift.MoveTo(floor));
+            AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
+
+            _testScheduler.Schedule(
+                TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval), 
+                () => _theLift.MoveTo(floor));
         }
 
-        private void LiftMakeDownwardsRequestFrom(int floor)
+        private void LiftMakeDownwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
         {
-            _testScheduler.Schedule(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + 500), () => _theLift.MakeDownwardsRequestFrom(floor));
+            AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
+
+            _testScheduler.Schedule(
+                TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval), 
+                () => _theLift.MakeDownwardsRequestFrom(floor));
         }
 
-        private void LiftMakeUpwardsRequestFrom(int floor)
+        private void LiftMakeUpwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
         {
-            _testScheduler.Schedule(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + 500), () => _theLift.MakeUpwardsRequestFrom(floor));
+            AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
+
+            _testScheduler.Schedule(
+                TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval), 
+                () => _theLift.MakeUpwardsRequestFrom(floor));
+        }
+
+        private void AmendMostRecentEventTimeIfNecessary(bool shouldBeActedUponImmediately)
+        {
+            _millisecondsTakenByMostRecentEvent = shouldBeActedUponImmediately
+                ? TimeConstants.FloorInterval + TimeConstants.BetweenFloorsInterval
+                : _millisecondsTakenByMostRecentEvent;
         }
 
         private ElevatorTests LiftExpectToStopAt(int floor)
         {
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
-            _millisecondsTakenByMostRecentEvent = TimeConstants.WaitTime;
+            _millisecondsTakenByMostRecentEvent = TimeConstants.WaitTime + TimeConstants.FloorInterval;
             _numExpectedStatuses++;
             _currentLiftFloor = floor;
             return this;
@@ -718,7 +738,7 @@ namespace ElevatorKata01.Tests
             _liftStatuses.Clear();
             _expectedLiftStatuses.Clear();
 
-            _millisecondsSinceTestStarted = 0;
+            _millisecondsSinceTestStarted = TimeConstants.FloorInterval;
             _millisecondsTakenByMostRecentEvent = 0;
             _numExpectedStatuses = 0;
 
