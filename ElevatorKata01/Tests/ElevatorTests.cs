@@ -13,6 +13,24 @@ namespace ElevatorKata01.Tests
     [TestFixture]
     public class ElevatorTests : ILiftMonitor
     {
+            //// Arrange
+            //LiftMakeStartAt(xx);
+
+            //// Act
+            //_theLift.MakeUpwardsRequestFrom(xx);
+
+            //LiftExpectToLeaveFrom(xx);
+            //LiftExpectToVisit(xx);
+            //LiftExpectToStopAt(xx);
+            //LiftMakeRequestToMoveTo(xx);
+            //LiftMakeUpwardsRequestFrom(xx);
+            //LiftMakeDownwardsRequestFrom(xx);
+
+            //StartTest();
+
+            //// Assert
+            //VerifyAllMarkers();
+
         private readonly List<LiftStatus> _liftStatuses = new List<LiftStatus>();
         private readonly List<ExpectedLiftStatus> _expectedLiftStatuses = new List<ExpectedLiftStatus>();
 
@@ -27,6 +45,7 @@ namespace ElevatorKata01.Tests
         private readonly TestScheduler _testScheduler = new TestScheduler();
         private ObservableLift _theLift;
         private int _millisecondsSinceTestStarted;
+        private int _millisecondsTakenByMostRecentEvent;
         private int _numExpectedStatuses;
         private int _currentLiftFloor;
 
@@ -519,33 +538,35 @@ namespace ElevatorKata01.Tests
         public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_but_next_downwards_request_is_higher_up_then_it_will_keep_moving_upwards_but_then_come_down()
         {
             // Arrange
-            int betweenMinusFifthAndMinusFourthFloors = (2 * TimeConstants.FloorInterval) + 500;
-            int afterStoppingOnMinusThirdFloor = (4 * TimeConstants.FloorInterval) + 500;
-            int afterStoppingOnMinusFirstFloor = (18 * TimeConstants.FloorInterval) + 500;
-            var testScheduler = new TestScheduler();
-            var theLift = new ObservableLift(-6, testScheduler);
-            _liftStatuses.Clear();
-            theLift.Subscribe(this);
             LiftMakeStartAt(-6);
 
             // Act
-            theLift.MakeUpwardsRequestFrom(-3);
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(betweenMinusFifthAndMinusFourthFloors), () => theLift.MakeDownwardsRequestFrom(-1));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusThirdFloor), () => theLift.MoveTo(-2));
-            testScheduler.Schedule(TimeSpan.FromMilliseconds(afterStoppingOnMinusFirstFloor), () => theLift.MoveTo(-4));
-            testScheduler.Start();
+            _theLift.MakeUpwardsRequestFrom(-3);
+
+            LiftExpectToLeaveFrom(-6);
+            LiftExpectToVisit(-5);
+
+            LiftMakeDownwardsRequestFrom(-1);
+
+            LiftExpectToVisit(-4);
+            LiftExpectToStopAt(-3);
+
+            LiftMakeRequestToMoveTo(-2);
+
+            LiftExpectToLeaveFrom(-3);
+            LiftExpectToStopAt(-2);
+
+            LiftExpectToLeaveFrom(-2).Mark(Direction.Up);
+            LiftExpectToStopAt(-1).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(-4);
+            
+            LiftExpectToLeaveFrom(-1).Mark(Direction.Down);
+
+            StartTest();
 
             // Assert
-            Assert.That(_liftStatuses.Count, Is.GreaterThanOrEqualTo(9));
-
-            Assert.That(_liftStatuses[6].CurrentDirection, Is.EqualTo(Direction.Up));
-            Assert.That(_liftStatuses[6].CurrentFloor, Is.EqualTo(-2));
-
-            Assert.That(_liftStatuses[7].CurrentDirection, Is.EqualTo(Direction.None));
-            Assert.That(_liftStatuses[7].CurrentFloor, Is.EqualTo(-1));
-
-            Assert.That(_liftStatuses[8].CurrentDirection, Is.EqualTo(Direction.Down));
-            Assert.That(_liftStatuses[8].CurrentFloor, Is.EqualTo(-1));
+            VerifyAllMarkers();
         }
 
         [Test]
@@ -649,6 +670,8 @@ namespace ElevatorKata01.Tests
 
         private void StartTest()
         {
+            _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
+
             _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted).Ticks);
         }
 
@@ -669,7 +692,8 @@ namespace ElevatorKata01.Tests
 
         private ElevatorTests LiftExpectToStopAt(int floor)
         {
-            _millisecondsSinceTestStarted += TimeConstants.WaitTime;
+            _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
+            _millisecondsTakenByMostRecentEvent = TimeConstants.WaitTime;
             _numExpectedStatuses++;
             _currentLiftFloor = floor;
             return this;
@@ -682,7 +706,8 @@ namespace ElevatorKata01.Tests
 
         private ElevatorTests LiftExpectToVisit(int floor)
         {
-            _millisecondsSinceTestStarted += TimeConstants.FloorInterval;
+            _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
+            _millisecondsTakenByMostRecentEvent = TimeConstants.FloorInterval;
             _numExpectedStatuses++;
             _currentLiftFloor = floor;
             return this;
@@ -694,6 +719,7 @@ namespace ElevatorKata01.Tests
             _expectedLiftStatuses.Clear();
 
             _millisecondsSinceTestStarted = 0;
+            _millisecondsTakenByMostRecentEvent = 0;
             _numExpectedStatuses = 0;
 
             _theLift = new ObservableLift(floor, _testScheduler);
