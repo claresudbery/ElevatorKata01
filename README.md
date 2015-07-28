@@ -142,6 +142,11 @@ More sophisticated lift-stopping algorithm:
 		a) somebody tells the lift where they want to go
 		b) a certain amount of time has elapsed
 If the lift is called down to a negative floor, if no requests are made then it should return back up to the ground floor.
+At some point in the future, we might want to be a bit more sophisticated about what "Wait" means:
+	- Don't just wait five seconds for something to happen:
+	- If you've reached the end of an upwards or downwards series of actions, just wait until someone has exited the lift, then change direction
+		- needs to have awareness of people entering / leaving lift
+		- might need to know the difference of arriving somewhere in order to deliver someone, and arriving somewhere in order to pick someone up
 		
 Possible technologies for a UI: 
 	recommended by Braithers:
