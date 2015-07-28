@@ -563,6 +563,216 @@ namespace ElevatorKata01.Tests
             // Assert
             VerifyAllMarkers();
         }
+
+        [Test]
+        // Lift is below the ground floor, but next upwards request has come from a lower floor
+        public void When_lift_is_below_ground_and_reaches_lowest_stop_on_downwards_journey_but_next_upwards_request_is_lower_down_then_it_will_keep_moving_downwards_but_then_come_up()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeDownwardsRequestFrom(-3);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(-1);
+
+            LiftMakeUpwardsRequestFrom(-5, shouldBeActedUponImmediately: false);
+
+            LiftExpectToVisit(-2);
+            LiftExpectToStopAt(-3);
+
+            LiftMakeRequestToMoveTo(-4, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(-3);
+            LiftExpectToStopAt(-4);
+
+            LiftExpectToLeaveFrom(-4).Mark(Direction.Down);
+            LiftExpectToStopAt(-5).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(-2, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(-5).Mark(Direction.Up);
+
+            StartTest();
+            
+            // Assert
+            VerifyAllMarkers();
+        }
+
+        //[Test]
+        //// Lift is below the ground floor, and next upwards request has come from a higher floor
+        //public void When_lift_is_above_ground_and_reaches_highest_stop_on_upwards_journey_and_next_downwards_request_is_lower_down_then_it_will_go_down_to_that_caller_and_then_continue_down()
+        //{
+        //    // Arrange
+        //    LiftMakeStartAt(GroundFloor);
+
+        //    // Act
+        //    _theLift.MakeUpwardsRequestFrom(ThirdFloor);
+
+        //    LiftExpectToLeaveFrom(GroundFloor);
+        //    LiftExpectToVisit(FirstFloor);
+
+        //    _theLift.MakeDownwardsRequestFrom(SecondFloor);
+
+        //    LiftExpectToVisit(SecondFloor);
+        //    LiftExpectToStopAt(ThirdFloor);
+
+        //    LiftMakeRequestToMoveTo(FourthFloor, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(ThirdFloor);
+        //    LiftExpectToStopAt(FourthFloor);
+
+        //    LiftExpectToLeaveFrom(FourthFloor).Mark(Direction.Down);
+        //    LiftExpectToVisit(ThirdFloor);
+        //    LiftExpectToVisit(SecondFloor).Mark(Direction.None);
+
+        //    LiftMakeRequestToMoveTo(FirstFloor, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(SecondFloor).Mark(Direction.Down);
+
+        //    StartTest();
+
+        //    // Assert
+        //    VerifyAllMarkers();
+        //}
+
+        //[Test]
+        //// Lift is below the ground floor, and there are no waiting requests (in which case it returns UP to the ground floor)
+        //public void When_lift_is_above_ground_and_reaches_highest_stop_on_upwards_journey_and_there_are_no_downwards_requests_then_it_will_return_to_the_ground_floor()
+        //{
+        //    // Arrange
+        //    LiftMakeStartAt(GroundFloor);
+
+        //    // Act
+        //    _theLift.MakeUpwardsRequestFrom(ThirdFloor);
+
+        //    LiftExpectToLeaveFrom(GroundFloor);
+        //    LiftExpectToVisit(FirstFloor);
+        //    LiftExpectToVisit(SecondFloor);
+        //    LiftExpectToStopAt(ThirdFloor);
+
+        //    LiftMakeRequestToMoveTo(FourthFloor, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(ThirdFloor);
+        //    LiftExpectToStopAt(FourthFloor);
+
+        //    LiftExpectToLeaveFrom(FourthFloor).Mark(Direction.Down);
+        //    LiftExpectToVisit(ThirdFloor);
+        //    LiftExpectToVisit(SecondFloor);
+        //    LiftExpectToVisit(FirstFloor);
+        //    LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
+
+        //    StartTest();
+
+        //    // Assert
+        //    VerifyAllMarkers();
+        //}
+
+        //[Test]
+        //// Lift is above the ground floor, but next upwards request has come from a lower floor
+        //public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_but_next_downwards_request_is_higher_up_then_it_will_keep_moving_upwards_but_then_come_down()
+        //{
+        //    // Arrange
+        //    LiftMakeStartAt(-6);
+
+        //    // Act
+        //    _theLift.MakeUpwardsRequestFrom(-3);
+
+        //    LiftExpectToLeaveFrom(-6);
+        //    LiftExpectToVisit(-5);
+
+        //    LiftMakeDownwardsRequestFrom(-1, shouldBeActedUponImmediately: false);
+
+        //    LiftExpectToVisit(-4);
+        //    LiftExpectToStopAt(-3);
+
+        //    LiftMakeRequestToMoveTo(-2, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(-3);
+        //    LiftExpectToStopAt(-2);
+
+        //    LiftExpectToLeaveFrom(-2).Mark(Direction.Up);
+        //    LiftExpectToStopAt(-1).Mark(Direction.None);
+
+        //    LiftMakeRequestToMoveTo(-4, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(-1).Mark(Direction.Down);
+
+        //    StartTest();
+
+        //    // Assert
+        //    VerifyAllMarkers();
+        //}
+
+        //[Test]
+        //// Lift is above the ground floor, and next upwards request has come from a higher floor
+        //public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_next_downwards_request_is_lower_down_then_it_will_go_down_to_that_caller_and_then_continue_down()
+        //{
+        //    // Arrange
+        //    LiftMakeStartAt(-6);
+
+        //    // Act
+        //    _theLift.MakeUpwardsRequestFrom(-3);
+
+        //    LiftExpectToLeaveFrom(-6);
+        //    LiftExpectToVisit(-5);
+
+        //    LiftMakeDownwardsRequestFrom(-5, shouldBeActedUponImmediately: false);
+
+        //    LiftExpectToVisit(-4);
+        //    LiftExpectToStopAt(-3);
+
+        //    LiftMakeRequestToMoveTo(-2, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(-3);
+        //    LiftExpectToStopAt(-2);
+
+        //    LiftExpectToLeaveFrom(-2).Mark(Direction.Down);
+        //    LiftExpectToVisit(-3);
+        //    LiftExpectToVisit(-4);
+        //    LiftExpectToStopAt(-5).Mark(Direction.None);
+
+        //    LiftMakeRequestToMoveTo(-6, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(-5).Mark(Direction.Down);
+        //    LiftExpectToStopAt(-6);
+
+        //    StartTest();
+
+        //    // Assert
+        //    VerifyAllMarkers();
+        //}
+
+        //[Test]
+        //// Lift is above the ground floor, and there are no waiting requests (in which case it returns DOWN to the ground floor)
+        //public void When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_there_are_no_downwards_requests_then_it_will_return_to_the_ground_floor()
+        //{
+        //    // Arrange
+        //    LiftMakeStartAt(-6);
+
+        //    // Act
+        //    _theLift.MakeUpwardsRequestFrom(-3);
+
+        //    LiftExpectToLeaveFrom(-6);
+        //    LiftExpectToVisit(-5);
+        //    LiftExpectToVisit(-4);
+        //    LiftExpectToStopAt(-3);
+
+        //    LiftMakeRequestToMoveTo(-2, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(-3);
+        //    LiftExpectToStopAt(-2);
+
+        //    LiftExpectToLeaveFrom(-2).Mark(Direction.Up);
+        //    LiftExpectToVisit(-1);
+        //    LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
+
+        //    StartTest();
+
+        //    // Assert
+        //    VerifyAllMarkers();
+        //}
         
         private void VerifyAllMarkers()
         {
