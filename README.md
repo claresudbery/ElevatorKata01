@@ -97,13 +97,12 @@ When the lift reaches the highest stop on an upwards journey, it should either r
 		to 
 			When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_there_are_no_downwards_requests_then_it_will_return_to_the_ground_floor)
 When the lift reaches the lowest stop on a downwards journey, it should either return to the ground floor or start processing any waiting upwards-moving requests.
-	There are six possibilities (none written yet):
-		Lift is below the ground floor, but next upwards request has come from a lower floor
-		Lift is below the ground floor, and next upwards request has come from a higher floor
-		Lift is below the ground floor, and there are no waiting requests (in which case it returns UP to the ground floor)
-		Lift is above the ground floor, but next upwards request has come from a lower floor
-		Lift is above the ground floor, and next upwards request has come from a higher floor
-		Lift is above the ground floor, and there are no waiting requests (in which case it returns DOWN to the ground floor)
+	There are six possibilities:
+		(tests have been written for all six - 
+		from 
+			When_lift_is_below_ground_and_reaches_lowest_stop_on_downwards_journey_but_next_upwards_request_is_lower_down_then_it_will_keep_moving_downwards_but_then_come_up
+		to 
+			When_lift_is_above_ground_and_reaches_lowest_stop_on_downwards_journey_and_there_are_no_upwards_requests_then_it_will_return_to_the_ground_floor)
 If we're moving downwards and somebody makes a new downwards call, we only process it if they are below where we currently are.
 	...and if we're moving upwards and somebody makes a new upwards call, we only process it if they are above where we currently are.
 If the lift runs out of upwards requests 
