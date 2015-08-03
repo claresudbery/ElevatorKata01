@@ -770,5 +770,56 @@ namespace ElevatorKata01.Tests
             // Assert
             VerifyAllMarkers();
         }
+
+        [Test]
+        public void Given_lift_is_moving_upwards_when_a_new_upwards_request_comes_in_from_a_lower_floor_it_is_not_processed_until_after_any_downwards_requests()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeUpwardsRequestFrom(FourthFloor);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(FirstFloor);
+
+            LiftMakeDownwardsRequestFrom(SixthFloor, shouldBeActedUponImmediately: false);
+
+            LiftExpectToVisit(SecondFloor);
+
+            LiftMakeUpwardsRequestFrom(FirstFloor, shouldBeActedUponImmediately: false);
+
+            LiftExpectToVisit(ThirdFloor).Mark(Direction.Up);
+            LiftExpectToStopAt(FourthFloor);
+
+            LiftMakeRequestToMoveTo(FifthFloor, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(FourthFloor).Mark(Direction.Up);
+            LiftExpectToStopAt(FifthFloor);
+
+            LiftExpectToLeaveFrom(FifthFloor);
+            LiftExpectToStopAt(SixthFloor).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(GroundFloor, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(SixthFloor).Mark(Direction.Down);
+            LiftExpectToVisit(FifthFloor);
+            LiftExpectToVisit(FourthFloor);
+            LiftExpectToVisit(ThirdFloor);
+            LiftExpectToVisit(SecondFloor);
+            LiftExpectToVisit(FirstFloor).Mark(Direction.Down);
+            LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
+
+            LiftExpectToLeaveFrom(GroundFloor).Mark(Direction.Up);
+            LiftExpectToStopAt(FirstFloor).Mark(Direction.None);
+
+            LiftExpectToLeaveFrom(FirstFloor).Mark(Direction.Down);
+            LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
     }
 }
