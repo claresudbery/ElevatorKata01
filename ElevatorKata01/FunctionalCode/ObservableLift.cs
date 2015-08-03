@@ -94,6 +94,10 @@ namespace ElevatorKata01.FunctionalCode
                 {
                     MoveDownwards();
                 }
+                else if (UpFloorsWaiting)
+                {
+                    MoveUpwards();
+                }
                 else
                 {
                     if (_currentFloor != GroundFloor)
