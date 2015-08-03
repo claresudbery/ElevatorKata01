@@ -743,7 +743,6 @@ namespace ElevatorKata01.Tests
         }
 
         [Test]
-        // Lift is above the ground floor, and there are no waiting requests (in which case it returns DOWN to the ground floor)
         public void When_lift_is_above_ground_and_reaches_lowest_stop_on_downwards_journey_and_there_are_no_upwards_requests_then_it_will_return_to_the_ground_floor()
         {
             // Arrange
