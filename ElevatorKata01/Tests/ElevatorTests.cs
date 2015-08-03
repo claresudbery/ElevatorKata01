@@ -821,5 +821,56 @@ namespace ElevatorKata01.Tests
             // Assert
             VerifyAllMarkers();
         }
+
+        [Test]
+        public void Given_lift_is_moving_downwards_when_a_new_downwards_request_comes_in_from_a_higher_floor_it_is_not_processed_until_after_any_upwards_requests()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeDownwardsRequestFrom(-4);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(-1);
+
+            LiftMakeUpwardsRequestFrom(-6, shouldBeActedUponImmediately: false);
+
+            LiftExpectToVisit(-2);
+
+            LiftMakeDownwardsRequestFrom(-1, shouldBeActedUponImmediately: false);
+
+            LiftExpectToVisit(-3).Mark(Direction.Down);
+            LiftExpectToStopAt(-4);
+
+            LiftMakeRequestToMoveTo(-5, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(-4).Mark(Direction.Down);
+            LiftExpectToStopAt(-5);
+
+            LiftExpectToLeaveFrom(-5);
+            LiftExpectToStopAt(-6).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(GroundFloor, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(-6).Mark(Direction.Up);
+            LiftExpectToVisit(-5);
+            LiftExpectToVisit(-4);
+            LiftExpectToVisit(-3);
+            LiftExpectToVisit(-2);
+            LiftExpectToVisit(-1).Mark(Direction.Up);
+            LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
+
+            LiftExpectToLeaveFrom(GroundFloor).Mark(Direction.Down);
+            LiftExpectToStopAt(-1).Mark(Direction.None);
+
+            LiftExpectToLeaveFrom(-1).Mark(Direction.Up);
+            LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
     }
 }

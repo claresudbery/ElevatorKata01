@@ -309,7 +309,7 @@ namespace ElevatorKata01.FunctionalCode
         {
             get
             {
-                return _goingUp.Any();
+                return _goingUp.Any(i => i >= _currentFloor || _currentDirectionBeingProcessed != Direction.Up);
             }
         }
 
@@ -317,7 +317,7 @@ namespace ElevatorKata01.FunctionalCode
         {
             get
             {
-                return _goingDown.Any();
+                return _goingDown.Any(i => i <= _currentFloor || _currentDirectionBeingProcessed != Direction.Down);
             }
         }
 
