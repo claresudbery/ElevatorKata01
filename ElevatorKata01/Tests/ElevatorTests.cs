@@ -10,8 +10,11 @@ using Assert = NUnit.Framework.Assert;
 
 namespace ElevatorKata01.Tests
 {
+    /// <summary>
+    /// All the utility code is in ElevatorUtils.cs, so that the tests themselves can be kept separate.
+    /// </summary>
     [TestFixture]
-    public class ElevatorTests : ILiftMonitor
+    public partial class ElevatorTests : ILiftMonitor
     {
         private readonly List<LiftStatus> _liftStatuses = new List<LiftStatus>();
         private readonly List<ExpectedLiftStatus> _expectedLiftStatuses = new List<ExpectedLiftStatus>();
@@ -565,7 +568,6 @@ namespace ElevatorKata01.Tests
         }
 
         [Test]
-        // Lift is below the ground floor, but next upwards request has come from a lower floor
         public void When_lift_is_below_ground_and_reaches_lowest_stop_on_downwards_journey_but_next_upwards_request_is_lower_down_then_it_will_keep_moving_downwards_but_then_come_up()
         {
             // Arrange
@@ -595,7 +597,7 @@ namespace ElevatorKata01.Tests
             LiftExpectToLeaveFrom(-5).Mark(Direction.Up);
 
             StartTest();
-            
+
             // Assert
             VerifyAllMarkers();
         }
@@ -773,133 +775,5 @@ namespace ElevatorKata01.Tests
         //    // Assert
         //    VerifyAllMarkers();
         //}
-        
-        private void VerifyAllMarkers()
-        {
-            Assert.That(_testStarted, Is.EqualTo(true), "Test scheduler was never kicked off!");
-            Assert.That(_liftStatuses.Count, Is.EqualTo(_numExpectedStatuses));
-
-            foreach (var expectedStatus in _expectedLiftStatuses)
-            {
-                Assert.That(_liftStatuses[expectedStatus.StatusIndex].CurrentDirection, Is.EqualTo(expectedStatus.Status.CurrentDirection));
-                Assert.That(_liftStatuses[expectedStatus.StatusIndex].CurrentFloor, Is.EqualTo(expectedStatus.Status.CurrentFloor));
-            }
-
-            _theLift.Dispose();
-            EnsureThatAllScheduledEventsAreRunThroughToCompletion();
-            _testStarted = false;
-        }
-        
-        private void EnsureThatAllScheduledEventsAreRunThroughToCompletion()
-        {
-            _testScheduler.Start();
-        }
-
-        private void Mark(Direction direction)
-        {
-            _expectedLiftStatuses.Add(new ExpectedLiftStatus
-            {
-                StatusIndex = _numExpectedStatuses - 1,
-                SecondsSinceTestStarted = _millisecondsSinceTestStarted / 1000m,
-                Status = new LiftStatus
-                {
-                    CurrentDirection = direction,
-                    CurrentFloor = _currentLiftFloor
-                }
-            });
-        }
-
-        private void StartTest()
-        {
-            _testStarted = true;
-            _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
-
-            _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted).Ticks);
-        }
-
-        private void LiftMakeRequestToMoveTo(int floor, bool shouldBeActedUponImmediately)
-        {
-            AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
-
-            _testScheduler.Schedule(
-                TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval), 
-                () => _theLift.MoveTo(floor));
-        }
-
-        private void LiftMakeDownwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
-        {
-            AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
-
-            _testScheduler.Schedule(
-                TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval), 
-                () => _theLift.MakeDownwardsRequestFrom(floor));
-        }
-
-        private void LiftMakeUpwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
-        {
-            AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
-
-            _testScheduler.Schedule(
-                TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval), 
-                () => _theLift.MakeUpwardsRequestFrom(floor));
-        }
-
-        private void AmendMostRecentEventTimeIfNecessary(bool shouldBeActedUponImmediately)
-        {
-            _millisecondsTakenByMostRecentEvent = shouldBeActedUponImmediately
-                ? TimeConstants.FloorInterval + TimeConstants.BetweenFloorsInterval
-                : _millisecondsTakenByMostRecentEvent;
-        }
-
-        private ElevatorTests LiftExpectToStopAt(int floor)
-        {
-            _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
-            _millisecondsTakenByMostRecentEvent = TimeConstants.WaitTime + TimeConstants.FloorInterval;
-            _numExpectedStatuses++;
-            _currentLiftFloor = floor;
-            return this;
-        }
-
-        private ElevatorTests LiftExpectToLeaveFrom(int floor)
-        {
-            return LiftExpectToVisit(floor);
-        }
-
-        private ElevatorTests LiftExpectToVisit(int floor)
-        {
-            _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
-            _millisecondsTakenByMostRecentEvent = TimeConstants.FloorInterval;
-            _numExpectedStatuses++;
-            _currentLiftFloor = floor;
-            return this;
-        }
-
-        private void LiftMakeStartAt(int floor)
-        {
-            _liftStatuses.Clear();
-            _expectedLiftStatuses.Clear();
-
-            _millisecondsSinceTestStarted = TimeConstants.FloorInterval;
-            _millisecondsTakenByMostRecentEvent = 0;
-            _numExpectedStatuses = 0;
-
-            _theLift = new ObservableLift(floor, _testScheduler);
-            _theLift.Subscribe(this);
-        }
-
-        public void OnNext(LiftStatus currentLiftStatus)
-        {
-            _liftStatuses.Add(currentLiftStatus);
-        }
-
-        public void OnError(Exception error)
-        {
-            // Do nothing
-        }
-
-        public void OnCompleted()
-        {
-            // Do nothing
-        }
     }
 }
