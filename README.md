@@ -85,24 +85,23 @@ Note that the basic algorithm being used at this point is pretty simple:
 			(and there is probably a danger that some poor person would get left stranded on the top floor because fetching them would never represent the most efficient use of the resource)
 	
 Tests which might need writing:
+When two or more requests are made between floors, they are all serviced correctly
+	I'm not sure the test code will handle this correctly! Might affect the time intervals?
+If somebody asks the lift to move to a floor which somebody else has already called the lift to, it can handle this
+If somebody makes a request from a floor which somebody else has already made a request from, it can handle this
+If somebody calls the lift while it is stopped on a floor because somebody called it there, it will start moving again
+	At some point we will need to add something in which understands that first it needs to make sure that it has opened the doors and given people a chance to enter
+	Also maybe we need to detect whether somebody is literally in the process of entering / leaving the lift before closing the doors??
+If somebody calls the lift while it is stopped on a floor because somebody has just exited the lift, it will start moving again
+	At some point we will need to add something in which understands that first it needs to make sure that it has opened the doors and given people a chance to enter
+	Also maybe we need to detect whether somebody is literally in the process of entering / leaving the lift before closing the doors??
 When lift is first created, if it is not on the ground floor, after waiting for a bit it returns to the ground floor
-When_lift_moves_up_and_then_down_then_it_should_not_try_to_return_to_its_previous_up_destination
-	Remove destination from queue on arrival!
 Stops should be visited in the correct order (if people on floors 3, 5 7 and 9 are all travelling upwards but make their requests in a different order, they should still be visited in ascending order)
-When the lift reaches the highest stop on an upwards journey, it should either return to the ground floor or start processing any waiting downwards-moving requests.
-	There are six possibilities:
-		(tests have been written for all six - 
-		from 
-			When_lift_is_above_ground_and_reaches_highest_stop_on_upwards_journey_but_next_downwards_request_is_higher_up_then_it_will_keep_moving_upwards_but_then_come_down
-		to 
-			When_lift_is_below_ground_and_reaches_highest_stop_on_upwards_journey_and_there_are_no_downwards_requests_then_it_will_return_to_the_ground_floor)
-When the lift reaches the lowest stop on a downwards journey, it should either return to the ground floor or start processing any waiting upwards-moving requests.
-	There are six possibilities:
-		(tests have been written for all six - 
-		from 
-			When_lift_is_below_ground_and_reaches_lowest_stop_on_downwards_journey_but_next_upwards_request_is_lower_down_then_it_will_keep_moving_downwards_but_then_come_up
-		to 
-			When_lift_is_above_ground_and_reaches_lowest_stop_on_downwards_journey_and_there_are_no_upwards_requests_then_it_will_return_to_the_ground_floor)
+	This should be tested on:
+		upwards requests only
+			this test has been added but commented out, as some other issues arose which needed individual tests writing (see above)
+		downwards requests only
+		a mixture of both
 If we're moving downwards and somebody makes a new downwards call, we only process it if they are below where we currently are.
 	...and if we're moving upwards and somebody makes a new upwards call, we only process it if they are above where we currently are.
 If the lift runs out of upwards requests 

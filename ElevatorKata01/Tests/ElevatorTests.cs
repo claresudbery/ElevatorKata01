@@ -872,5 +872,122 @@ namespace ElevatorKata01.Tests
             // Assert
             VerifyAllMarkers();
         }
+
+        [Test]
+        public void When_two_or_more_requests_are_made_between_floors_they_are_all_serviced_correctly()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeUpwardsRequestFrom(7);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(1);
+            LiftExpectToVisit(2);
+
+            LiftMakeUpwardsRequestFrom(5, shouldBeActedUponImmediately: false);
+            LiftMakeDownwardsRequestFrom(4, shouldBeActedUponImmediately: false);
+            LiftMakeUpwardsRequestFrom(7, shouldBeActedUponImmediately: false);
+
+            LiftExpectToVisit(3);
+            LiftExpectToVisit(4);
+            LiftExpectToStopAt(5).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(6, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(5);
+            LiftExpectToStopAt(6);
+
+            LiftExpectToLeaveFrom(6);
+            LiftExpectToStopAt(7).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(8, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(7);
+            LiftExpectToStopAt(8);
+
+            LiftExpectToLeaveFrom(8).Mark(Direction.Down);
+            LiftExpectToVisit(7);
+            LiftExpectToVisit(6);
+            LiftExpectToVisit(5);
+            LiftExpectToStopAt(4).Mark(Direction.None);
+            
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
+
+        //[Test]
+        //public void When_several_upwards_requests_come_through_in_a_different_order_then_they_should_still_be_visited_in_the_correct_order()
+        //{
+        //    // Arrange
+        //    LiftMakeStartAt(GroundFloor);
+
+        //    // Act
+        //    _theLift.MakeUpwardsRequestFrom(13);
+
+        //    LiftExpectToLeaveFrom(GroundFloor);
+        //    LiftExpectToVisit(1);
+
+        //    LiftMakeUpwardsRequestFrom(11, shouldBeActedUponImmediately: false);
+
+        //    LiftExpectToVisit(2);
+
+        //    LiftMakeUpwardsRequestFrom(3, shouldBeActedUponImmediately: false);
+
+        //    LiftExpectToStopAt(3).Mark(Direction.None);
+
+        //    LiftMakeRequestToMoveTo(5, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(3);
+
+        //    LiftMakeUpwardsRequestFrom(7, shouldBeActedUponImmediately: false);
+
+        //    LiftExpectToVisit(4);
+        //    LiftExpectToStopAt(5).Mark(Direction.None);
+
+        //    LiftMakeUpwardsRequestFrom(6, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(5);
+        //    LiftExpectToStopAt(6).Mark(Direction.None);
+
+        //    LiftMakeRequestToMoveTo(7, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(6);
+        //    LiftExpectToStopAt(7).Mark(Direction.None);
+
+        //    LiftMakeRequestToMoveTo(15, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(7);
+        //    LiftExpectToVisit(8);
+        //    LiftExpectToVisit(9);
+        //    LiftExpectToVisit(10);
+        //    LiftExpectToStopAt(11).Mark(Direction.None);
+
+        //    LiftMakeRequestToMoveTo(15, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(11);
+        //    LiftExpectToVisit(12);
+        //    LiftExpectToStopAt(13).Mark(Direction.None);
+
+        //    LiftMakeRequestToMoveTo(17, shouldBeActedUponImmediately: true);
+
+        //    LiftExpectToLeaveFrom(13);
+        //    LiftExpectToVisit(14);
+        //    LiftExpectToStopAt(15).Mark(Direction.None);
+
+        //    LiftExpectToLeaveFrom(15);
+        //    LiftExpectToVisit(16);
+        //    LiftExpectToStopAt(17).Mark(Direction.None);
+
+        //    LiftExpectToLeaveFrom(17).Mark(Direction.Down);
+
+        //    StartTest();
+
+        //    // Assert
+        //    VerifyAllMarkers();
+        //}
     }
 }
