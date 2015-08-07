@@ -880,7 +880,7 @@ namespace ElevatorKata01.Tests
             LiftMakeStartAt(GroundFloor);
 
             // Act
-            _theLift.MakeUpwardsRequestFrom(7);
+            _theLift.MakeUpwardsRequestFrom(9);
 
             LiftExpectToLeaveFrom(GroundFloor);
             LiftExpectToVisit(1);
@@ -907,7 +907,17 @@ namespace ElevatorKata01.Tests
             LiftExpectToLeaveFrom(7);
             LiftExpectToStopAt(8);
 
-            LiftExpectToLeaveFrom(8).Mark(Direction.Down);
+            LiftExpectToLeaveFrom(8);
+            LiftExpectToStopAt(9).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(10, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(9);
+            LiftExpectToStopAt(10);
+
+            LiftExpectToLeaveFrom(10).Mark(Direction.Down);
+            LiftExpectToVisit(9);
+            LiftExpectToVisit(8);
             LiftExpectToVisit(7);
             LiftExpectToVisit(6);
             LiftExpectToVisit(5);
