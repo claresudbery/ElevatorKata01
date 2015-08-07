@@ -252,14 +252,14 @@ namespace ElevatorKata01.FunctionalCode
             }
         }
 
-        private void RemoveUpFloorFromDestinations(int floor)
+        private void RemoveUpFloorFromDestinations(int specifiedFloor)
         {
-            _goingUp.Remove(floor);
+            _goingUp.RemoveAll(floor => floor == specifiedFloor);
         }
 
-        private void RemoveDownFloorFromDestinations(int floor)
+        private void RemoveDownFloorFromDestinations(int specifiedFloor)
         {
-            _goingDown.Remove(floor);
+            _goingDown.RemoveAll(floor => floor == specifiedFloor);
         }
 
         private void DoNothing(int floor)
