@@ -20,8 +20,19 @@ namespace ElevatorKata01.Tests
 
                 foreach (var expectedStatus in _expectedLiftStatuses)
                 {
-                    Assert.That(_liftStatuses[expectedStatus.StatusIndex].CurrentDirection, Is.EqualTo(expectedStatus.Status.CurrentDirection));
-                    Assert.That(_liftStatuses[expectedStatus.StatusIndex].CurrentFloor, Is.EqualTo(expectedStatus.Status.CurrentFloor));
+                    Assert.That(
+                        _liftStatuses[expectedStatus.StatusIndex].CurrentDirection, 
+                        Is.EqualTo(expectedStatus.Status.CurrentDirection),
+                        "Floor " + expectedStatus.Status.CurrentFloor
+                            + ", Direction " + expectedStatus.Status.CurrentDirection 
+                            + ", Index " + expectedStatus.StatusIndex);
+
+                    Assert.That(
+                        _liftStatuses[expectedStatus.StatusIndex].CurrentFloor, 
+                        Is.EqualTo(expectedStatus.Status.CurrentFloor),
+                        "Floor " + expectedStatus.Status.CurrentFloor
+                            + ", Direction " + expectedStatus.Status.CurrentDirection 
+                            + ", Index " + expectedStatus.StatusIndex);
                 }
             }
             finally
