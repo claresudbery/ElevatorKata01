@@ -85,6 +85,12 @@ Note that the basic algorithm being used at this point is pretty simple:
 			(and there is probably a danger that some poor person would get left stranded on the top floor because fetching them would never represent the most efficient use of the resource)
 	
 Tests which might need writing:
+Stops should be visited in the correct order (if people on floors 3, 5 7 and 9 are all travelling upwards but make their requests in a different order, they should still be visited in ascending order)
+	This has been tested on:
+		upwards requests only
+		downwards requests only
+	This has NOT been tested on:
+		a mixture of both
 When two or more move requests are made after the lift has stopped in response to a call, they are all serviced correctly
 	I'm not sure the test code will handle this correctly! Might affect the time intervals?
 If somebody calls the lift while it is stopped on a floor because somebody called it there, it will start moving again
@@ -94,12 +100,6 @@ If somebody calls the lift while it is stopped on a floor because somebody has j
 	At some point we will need to add something in which understands that first it needs to make sure that it has opened the doors and given people a chance to enter
 	Also maybe we need to detect whether somebody is literally in the process of entering / leaving the lift before closing the doors??
 When lift is first created, if it is not on the ground floor, after waiting for a bit it returns to the ground floor
-Stops should be visited in the correct order (if people on floors 3, 5 7 and 9 are all travelling upwards but make their requests in a different order, they should still be visited in ascending order)
-	This should be tested on:
-		upwards requests only
-			this test has been added but commented out, as some other issues arose which needed individual tests writing (see above)
-		downwards requests only
-		a mixture of both
 If we're moving downwards and somebody makes a new downwards call, we only process it if they are below where we currently are.
 	...and if we're moving upwards and somebody makes a new upwards call, we only process it if they are above where we currently are.
 If the lift runs out of upwards requests 
