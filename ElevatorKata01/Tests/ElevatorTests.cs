@@ -929,6 +929,134 @@ namespace ElevatorKata01.Tests
             VerifyAllMarkers();
         }
 
+        [Test]
+        public void When_lift_is_asked_to_move_to_a_floor_which_it_has_already_been_called_to_it_handles_it_correctly()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeUpwardsRequestFrom(2);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(1);
+
+            LiftMakeUpwardsRequestFrom(4, shouldBeActedUponImmediately: false);
+
+            LiftExpectToStopAt(2);
+
+            LiftMakeRequestToMoveTo(4, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(2);
+            LiftExpectToVisit(3);
+            LiftExpectToStopAt(4).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(5, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(4).Mark(Direction.Up);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
+
+        [Test]
+        public void When_lift_is_asked_to_move_to_a_floor_which_it_has_already_been_asked_to_move_to_it_handles_it_correctly()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeUpwardsRequestFrom(2);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(1);
+
+            LiftMakeUpwardsRequestFrom(3, shouldBeActedUponImmediately: false);
+
+            LiftExpectToStopAt(2);
+
+            LiftMakeRequestToMoveTo(4, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(2);
+            LiftExpectToStopAt(3);
+
+            LiftMakeRequestToMoveTo(4, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(3);
+            LiftExpectToStopAt(4).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(5, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(4).Mark(Direction.Up);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
+
+        [Test]
+        public void When_lift_is_called_to_a_floor_which_it_has_already_been_asked_to_move_to_it_handles_it_correctly()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeUpwardsRequestFrom(2);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(1);
+            LiftExpectToStopAt(2);
+
+            LiftMakeRequestToMoveTo(4, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(2);
+
+            LiftMakeUpwardsRequestFrom(4, shouldBeActedUponImmediately: false);
+
+            LiftExpectToVisit(3);
+            LiftExpectToStopAt(4).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(5, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(4).Mark(Direction.Up);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
+
+        [Test]
+        public void When_lift_is_called_to_a_floor_which_it_has_already_been_called_to_it_handles_it_correctly()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeUpwardsRequestFrom(4);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(1);
+            LiftExpectToVisit(2);
+
+            LiftMakeUpwardsRequestFrom(4, shouldBeActedUponImmediately: false);
+
+            LiftExpectToVisit(3);
+            LiftExpectToStopAt(4).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(5, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(4).Mark(Direction.Up);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
+
         //[Test]
         //public void When_several_upwards_requests_come_through_in_a_different_order_then_they_should_still_be_visited_in_the_correct_order()
         //{

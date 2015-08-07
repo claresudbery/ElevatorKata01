@@ -85,10 +85,8 @@ Note that the basic algorithm being used at this point is pretty simple:
 			(and there is probably a danger that some poor person would get left stranded on the top floor because fetching them would never represent the most efficient use of the resource)
 	
 Tests which might need writing:
-When two or more requests are made between floors, they are all serviced correctly
+When two or more move requests are made after the lift has stopped in response to a call, they are all serviced correctly
 	I'm not sure the test code will handle this correctly! Might affect the time intervals?
-If somebody asks the lift to move to a floor which somebody else has already called the lift to, it can handle this
-If somebody makes a request from a floor which somebody else has already made a request from, it can handle this
 If somebody calls the lift while it is stopped on a floor because somebody called it there, it will start moving again
 	At some point we will need to add something in which understands that first it needs to make sure that it has opened the doors and given people a chance to enter
 	Also maybe we need to detect whether somebody is literally in the process of entering / leaving the lift before closing the doors??
