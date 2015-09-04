@@ -1311,5 +1311,51 @@ namespace ElevatorKata01.Tests.Tests
             // Assert
             VerifyAllMarkers();
         }
+
+        [Test]
+        public void When_multiple_move_requests_are_made_after_lift_has_stopped_in_response_to_call_they_are_all_serviced_correctly()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeUpwardsRequestFrom(1);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToStopAt(1).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(2, false);
+            LiftMakeRequestToMoveTo(-1, false);
+            LiftMakeRequestToMoveTo(5, false);
+            LiftMakeRequestToMoveTo(-6, false);
+
+            LiftExpectToLeaveFrom(1).Mark(Direction.Up);
+            LiftExpectToStopAt(2).Mark(Direction.None);
+
+            LiftExpectToLeaveFrom(2).Mark(Direction.Up);
+            LiftExpectToVisit(3);
+            LiftExpectToVisit(4);
+            LiftExpectToStopAt(5).Mark(Direction.None);
+
+            LiftExpectToLeaveFrom(5).Mark(Direction.Down);
+            LiftExpectToVisit(4);
+            LiftExpectToVisit(3);
+            LiftExpectToVisit(2);
+            LiftExpectToVisit(1);
+            LiftExpectToVisit(0);
+            LiftExpectToStopAt(-1).Mark(Direction.None);
+
+            LiftExpectToLeaveFrom(-1).Mark(Direction.Down);
+            LiftExpectToVisit(-2);
+            LiftExpectToVisit(-3);
+            LiftExpectToVisit(-4);
+            LiftExpectToVisit(-5);
+            LiftExpectToStopAt(-6).Mark(Direction.None);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
     }
 }
