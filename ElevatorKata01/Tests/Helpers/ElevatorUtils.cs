@@ -2,9 +2,10 @@
 using System.Reactive.Concurrency;
 using ElevatorKata01.Elements;
 using ElevatorKata01.FunctionalCode;
+using ElevatorKata01.Tests.Helpers;
 using NUnit.Framework;
 
-namespace ElevatorKata01.Tests
+namespace ElevatorKata01.Tests.Tests
 {
     /// <summary>
     /// All the utility code is in here, so that the tests themselves can be kept separate.
@@ -16,7 +17,7 @@ namespace ElevatorKata01.Tests
             try
             {
                 Assert.That(_testStarted, Is.EqualTo(true), "Test scheduler was never kicked off!");
-                Assert.That(_liftStatuses.Count, Is.EqualTo(_numExpectedStatuses));
+                Assert.That((object) _liftStatuses.Count, Is.EqualTo(_numExpectedStatuses));
 
                 foreach (var expectedStatus in _expectedLiftStatuses)
                 {
@@ -74,8 +75,7 @@ namespace ElevatorKata01.Tests
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
-            _testScheduler.Schedule(
-                TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
+            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
                 () => _theLift.MoveTo(floor));
         }
 
@@ -83,8 +83,7 @@ namespace ElevatorKata01.Tests
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
-            _testScheduler.Schedule(
-                TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
+            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
                 () => _theLift.MakeDownwardsRequestFrom(floor));
         }
 
@@ -92,8 +91,7 @@ namespace ElevatorKata01.Tests
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
-            _testScheduler.Schedule(
-                TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
+            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
                 () => _theLift.MakeUpwardsRequestFrom(floor));
         }
 
@@ -104,7 +102,7 @@ namespace ElevatorKata01.Tests
                 : _millisecondsTakenByMostRecentEvent;
         }
 
-        private ElevatorTests LiftExpectToStopAt(int floor)
+        private Tests.ElevatorTests LiftExpectToStopAt(int floor)
         {
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
             _millisecondsTakenByMostRecentEvent = TimeConstants.WaitTime + TimeConstants.FloorInterval;
@@ -113,12 +111,12 @@ namespace ElevatorKata01.Tests
             return this;
         }
 
-        private ElevatorTests LiftExpectToLeaveFrom(int floor)
+        private Tests.ElevatorTests LiftExpectToLeaveFrom(int floor)
         {
             return LiftExpectToVisit(floor);
         }
 
-        private ElevatorTests LiftExpectToVisit(int floor)
+        private Tests.ElevatorTests LiftExpectToVisit(int floor)
         {
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
             _millisecondsTakenByMostRecentEvent = TimeConstants.FloorInterval;

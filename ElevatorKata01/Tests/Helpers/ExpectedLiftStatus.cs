@@ -1,6 +1,6 @@
 using ElevatorKata01.Elements;
 
-namespace ElevatorKata01.Tests
+namespace ElevatorKata01.Tests.Helpers
 {
     public struct ExpectedLiftStatus
     {

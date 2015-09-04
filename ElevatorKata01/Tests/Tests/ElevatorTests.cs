@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reactive.Concurrency;
+﻿using System.Collections.Generic;
 using ElevatorKata01.Elements;
 using ElevatorKata01.FunctionalCode;
+using ElevatorKata01.Tests.Helpers;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
-using Assert = NUnit.Framework.Assert;
 
-namespace ElevatorKata01.Tests
+namespace ElevatorKata01.Tests.Tests
 {
     /// <summary>
     /// All the utility code is in ElevatorUtils.cs, so that the tests themselves can be kept separate.
