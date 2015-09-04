@@ -5,7 +5,10 @@ using ElevatorKata01.FunctionalCode;
 using ElevatorKata01.Tests.Helpers;
 using NUnit.Framework;
 
+// ReSharper disable CheckNamespace 
+// - this is test helper code but not actual test code, so I don't want it in the Tests folder
 namespace ElevatorKata01.Tests.Tests
+// ReSharper restore CheckNamespace
 {
     /// <summary>
     /// All the utility code is in here, so that the tests themselves can be kept separate.
