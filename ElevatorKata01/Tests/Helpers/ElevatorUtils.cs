@@ -78,7 +78,9 @@ namespace ElevatorKata01.Tests.Tests
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
-            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
+            Scheduler.Schedule(
+                _testScheduler, 
+                TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
                 () => _theLift.MoveTo(floor));
         }
 
@@ -105,7 +107,7 @@ namespace ElevatorKata01.Tests.Tests
                 : _millisecondsTakenByMostRecentEvent;
         }
 
-        private Tests.ElevatorTests LiftExpectToStopAt(int floor)
+        private ElevatorTests LiftExpectToStopAt(int floor)
         {
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
             _millisecondsTakenByMostRecentEvent = TimeConstants.WaitTime + TimeConstants.FloorInterval;
@@ -114,12 +116,12 @@ namespace ElevatorKata01.Tests.Tests
             return this;
         }
 
-        private Tests.ElevatorTests LiftExpectToLeaveFrom(int floor)
+        private ElevatorTests LiftExpectToLeaveFrom(int floor)
         {
             return LiftExpectToVisit(floor);
         }
 
-        private Tests.ElevatorTests LiftExpectToVisit(int floor)
+        private ElevatorTests LiftExpectToVisit(int floor)
         {
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
             _millisecondsTakenByMostRecentEvent = TimeConstants.FloorInterval;
