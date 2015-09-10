@@ -14,6 +14,8 @@ elevator kata - first attempt (see http://blog.milesburton.com/2013/03/28/elevat
 
 Related links:
 
+A blog post wot I rote about making the tests readable (I'll write another one soon with more detail about the actual kata): http://engineering.laterooms.com/making-tests-readable/
+
 ReactiveX installer:
 https://www.microsoft.com/en-us/download/details.aspx?id=30708
  
