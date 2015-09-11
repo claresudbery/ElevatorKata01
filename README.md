@@ -87,23 +87,6 @@ Note that the basic algorithm being used at this point is pretty simple:
 			(and there is probably a danger that some poor person would get left stranded on the top floor because fetching them would never represent the most efficient use of the resource)
 	
 Tests which might need writing:
-Stops should be visited in the correct order (if people on floors 3, 5 7 and 9 are all travelling upwards but make their requests in a different order, they should still be visited in ascending order)
-	This has been tested on:
-		upwards requests only
-		downwards requests only
-	This has NOT been tested on:
-		a mixture of both
-When two or more move requests are made after the lift has stopped in response to a call, they are all serviced correctly
-	I'm not sure the test code will handle this correctly! Might affect the time intervals?
-If somebody calls the lift while it is stopped on a floor because somebody called it there, it will start moving again
-	At some point we will need to add something in which understands that first it needs to make sure that it has opened the doors and given people a chance to enter
-	Also maybe we need to detect whether somebody is literally in the process of entering / leaving the lift before closing the doors??
-If somebody calls the lift while it is stopped on a floor because somebody has just exited the lift, it will start moving again
-	At some point we will need to add something in which understands that first it needs to make sure that it has opened the doors and given people a chance to enter
-	Also maybe we need to detect whether somebody is literally in the process of entering / leaving the lift before closing the doors??
-When lift is first created, if it is not on the ground floor, after waiting for a bit it returns to the ground floor
-If we're moving downwards and somebody makes a new downwards call, we only process it if they are below where we currently are.
-	...and if we're moving upwards and somebody makes a new upwards call, we only process it if they are above where we currently are.
 If the lift runs out of upwards requests 
 	... and starts processing downwards requests...
 	... but the next downwards request is coming from a higher floor...
@@ -116,6 +99,9 @@ If the lift runs out of upwards requests
 			This is what is currently implemented, I think, because we say if direction is not Down then we are moving up (otherwise we are moving down)
 			The problem with this is that users will see the lift is coming towards them, but ignoring them and going straight past.
 		The alternative is that if an upwards request comes in which we are able to service on our way to the downwards request, we just cancel the downwards strategy and consider ourselves to be moving upwards again.
+			For now I'm leaving this with the status quo - ie the new upwards request is ignored until all downwards requests are serviced
+			(I've written a test to check that this is indeed the case:
+			Given_lift_has_finished_up_requests_and_the_next_downwards_request_comes_from_higher_up_when_a_new_up_request_comes_in_while_travelling_to_the_down_request_then_the_up_request_will_be_ignored_until_later)
 Consider all test scenarios and make sure they include negative floor numbers.
 If new downwards-moving requests are made while the lift is moving downwards, they only get picked up if their location is equal to or lower than the lift's current location.
 If new upwards-moving requests are made while the lift is moving upwards, they only get picked up if their location is equal to or higher than the lift's current location.
@@ -145,7 +131,14 @@ At some point in the future, we might want to be a bit more sophisticated about 
 	- If you've reached the end of an upwards or downwards series of actions, just wait until someone has exited the lift, then change direction
 		- needs to have awareness of people entering / leaving lift
 		- might need to know the difference of arriving somewhere in order to deliver someone, and arriving somewhere in order to pick someone up
-		
+If somebody calls the lift while it is stopped on a floor, it will start moving again
+	This test is written (When_lift_is_called_while_already_stopped_somewhere_else_it_will_respond_to_the_new_request), but...
+		At some point we will need to add something in which understands that first it needs to make sure that it has opened the doors and given people a chance to enter
+		Also maybe we need to detect whether somebody is literally in the process of entering / leaving the lift before closing the doors??
+		I think this would lead us to split this test into two versions:
+			If somebody calls the lift while it is stopped on a floor because somebody called it there, it will start moving again
+			If somebody calls the lift while it is stopped on a floor because somebody has just exited the lift, it will start moving again
+			
 Possible technologies for a UI: 
 	recommended by Braithers:
 		Ruby + Sinatra

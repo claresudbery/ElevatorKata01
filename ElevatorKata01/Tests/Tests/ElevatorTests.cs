@@ -217,6 +217,72 @@ namespace ElevatorKata01.Tests.Tests
         }
 
         [Test]
+        public void When_lift_is_above_ground_and_has_no_pending_requests_then_it_will_return_to_ground_floor()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeUpwardsRequestFrom(ThirdFloor);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(FirstFloor);
+            LiftExpectToVisit(SecondFloor);
+            LiftExpectToStopAt(ThirdFloor).Mark(Direction.None);
+
+            LiftExpectToLeaveFrom(ThirdFloor).Mark(Direction.Down);
+            LiftExpectToVisit(SecondFloor);
+            LiftExpectToVisit(FirstFloor);
+            LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
+
+        [Test]
+        public void When_lift_is_below_ground_and_has_no_pending_requests_then_it_will_return_to_ground_floor()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeDownwardsRequestFrom(-2);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(-1);
+            LiftExpectToStopAt(-2).Mark(Direction.None);
+
+            LiftExpectToLeaveFrom(-2).Mark(Direction.Up);
+            LiftExpectToVisit(-1);
+            LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
+
+        [Test]
+        public void When_lift_is_created_away_from_ground_floor_and_no_requests_are_made_it_will_return_to_ground_floor()
+        {
+            // Arrange
+            LiftMakeStartAt(ThirdFloor);
+
+            // Act
+            LiftExpectToLeaveFrom(ThirdFloor).Mark(Direction.Down);
+            LiftExpectToVisit(SecondFloor);
+            LiftExpectToVisit(FirstFloor);
+            LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
+
+        [Test]
         public void When_two_people_on_different_floors_call_lift_upwards_then_lift_will_stop_at_lower_person_first_even_though_higher_person_made_first_request()
         {
             // Arrange
@@ -1324,7 +1390,7 @@ namespace ElevatorKata01.Tests.Tests
             LiftExpectToLeaveFrom(GroundFloor);
             LiftExpectToStopAt(1).Mark(Direction.None);
 
-            LiftMakeRequestToMoveTo(2, false);
+            LiftMakeRequestToMoveTo(2, true);
             LiftMakeRequestToMoveTo(-1, false);
             LiftMakeRequestToMoveTo(5, false);
             LiftMakeRequestToMoveTo(-6, false);
@@ -1351,6 +1417,73 @@ namespace ElevatorKata01.Tests.Tests
             LiftExpectToVisit(-4);
             LiftExpectToVisit(-5);
             LiftExpectToStopAt(-6).Mark(Direction.None);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
+
+        [Test]
+        public void When_lift_is_called_while_already_stopped_somewhere_else_it_will_respond_to_the_new_request()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeUpwardsRequestFrom(ThirdFloor);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToVisit(FirstFloor);
+            LiftExpectToVisit(SecondFloor);
+            LiftExpectToStopAt(ThirdFloor).Mark(Direction.None);
+
+            LiftMakeDownwardsRequestFrom(FirstFloor, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(ThirdFloor).Mark(Direction.Down);
+            LiftExpectToVisit(SecondFloor);
+            LiftExpectToStopAt(FirstFloor).Mark(Direction.None);
+
+            StartTest();
+
+            // Assert
+            VerifyAllMarkers();
+        }
+
+        [Test]
+        public void Given_lift_has_finished_up_requests_and_the_next_downwards_request_comes_from_higher_up_when_a_new_up_request_comes_in_while_travelling_to_the_down_request_then_the_up_request_will_be_ignored_until_later()
+        {
+            // Arrange
+            LiftMakeStartAt(GroundFloor);
+
+            // Act
+            _theLift.MakeUpwardsRequestFrom(FirstFloor);
+
+            LiftMakeDownwardsRequestFrom(FourthFloor, shouldBeActedUponImmediately: false);
+
+            LiftExpectToLeaveFrom(GroundFloor);
+            LiftExpectToStopAt(FirstFloor);
+
+            LiftExpectToLeaveFrom(FirstFloor).Mark(Direction.Up);
+
+            LiftMakeUpwardsRequestFrom(ThirdFloor, shouldBeActedUponImmediately: true);
+
+            LiftExpectToVisit(SecondFloor);
+            LiftExpectToVisit(ThirdFloor);
+            LiftExpectToStopAt(FourthFloor).Mark(Direction.None);
+
+            LiftMakeRequestToMoveTo(GroundFloor, shouldBeActedUponImmediately: true);
+
+            LiftExpectToLeaveFrom(FourthFloor).Mark(Direction.Down);
+            LiftExpectToVisit(ThirdFloor);
+            LiftExpectToVisit(SecondFloor);
+            LiftExpectToVisit(FirstFloor);
+            LiftExpectToStopAt(GroundFloor).Mark(Direction.None);
+
+            LiftExpectToLeaveFrom(GroundFloor).Mark(Direction.Up);
+            LiftExpectToVisit(FirstFloor);
+            LiftExpectToVisit(SecondFloor);
+            LiftExpectToStopAt(ThirdFloor).Mark(Direction.None);
 
             StartTest();
 
