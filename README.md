@@ -103,8 +103,6 @@ If the lift runs out of upwards requests
 			(I've written a test to check that this is indeed the case:
 			Given_lift_has_finished_up_requests_and_the_next_downwards_request_comes_from_higher_up_when_a_new_up_request_comes_in_while_travelling_to_the_down_request_then_the_up_request_will_be_ignored_until_later)
 Consider all test scenarios and make sure they include negative floor numbers.
-If new downwards-moving requests are made while the lift is moving downwards, they only get picked up if their location is equal to or lower than the lift's current location.
-If new upwards-moving requests are made while the lift is moving upwards, they only get picked up if their location is equal to or higher than the lift's current location.
 Simpler lift-stopping algorithm:
 	When the lift arrives at a floor it is supposed to stop at, either because it is picking someone up from there or because it is dropping someone off (or both),
 	it will wait a certain amount of time (during which we can assume it has opened and closed its doors) and then move on.
@@ -125,7 +123,6 @@ More sophisticated lift-stopping algorithm:
 	it will ignore the exiting requirement and prioritise the boarding requirement, ie it will move on after either	
 		a) somebody tells the lift where they want to go
 		b) a certain amount of time has elapsed
-If the lift is called down to a negative floor, if no requests are made then it should return back up to the ground floor.
 At some point in the future, we might want to be a bit more sophisticated about what "Wait" means:
 	- Don't just wait five seconds for something to happen:
 	- If you've reached the end of an upwards or downwards series of actions, just wait until someone has exited the lift, then change direction

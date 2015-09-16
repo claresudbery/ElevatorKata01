@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using ElevatorKata01.Elements;
 using ElevatorKata01.FunctionalCode;
 using ElevatorKata01.Tests.Helpers;
+using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 
 // ReSharper disable CheckNamespace 
@@ -13,8 +15,27 @@ namespace ElevatorKata01.Tests.Tests
     /// <summary>
     /// All the utility code is in here, so that the tests themselves can be kept separate.
     /// </summary>
-    public partial class ElevatorTests : ILiftMonitor
+    public partial class SingleLiftTests : ILiftMonitor
     {
+        private readonly List<LiftStatus> _liftStatuses = new List<LiftStatus>();
+        private readonly List<ExpectedLiftStatus> _expectedLiftStatuses = new List<ExpectedLiftStatus>();
+
+        private const int GroundFloor = 0;
+        private const int FirstFloor = 1;
+        private const int SecondFloor = 2;
+        private const int ThirdFloor = 3;
+        private const int FourthFloor = 4;
+        private const int FifthFloor = 5;
+        private const int SixthFloor = 6;
+
+        private readonly TestScheduler _testScheduler = new TestScheduler();
+        private ObservableLift _theLift;
+        private int _millisecondsSinceTestStarted;
+        private int _millisecondsTakenByMostRecentEvent;
+        private int _numExpectedStatuses;
+        private int _currentLiftFloor;
+        private bool _testStarted = false;
+
         private void VerifyAllMarkers()
         {
             try
@@ -108,7 +129,7 @@ namespace ElevatorKata01.Tests.Tests
                 : _millisecondsTakenByMostRecentEvent;
         }
 
-        private ElevatorTests LiftExpectToStopAt(int floor)
+        private SingleLiftTests LiftExpectToStopAt(int floor)
         {
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
             _millisecondsTakenByMostRecentEvent = TimeConstants.WaitTime + TimeConstants.FloorInterval;
@@ -117,12 +138,12 @@ namespace ElevatorKata01.Tests.Tests
             return this;
         }
 
-        private ElevatorTests LiftExpectToLeaveFrom(int floor)
+        private SingleLiftTests LiftExpectToLeaveFrom(int floor)
         {
             return LiftExpectToVisit(floor);
         }
 
-        private ElevatorTests LiftExpectToVisit(int floor)
+        private SingleLiftTests LiftExpectToVisit(int floor)
         {
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
             _millisecondsTakenByMostRecentEvent = TimeConstants.FloorInterval;
