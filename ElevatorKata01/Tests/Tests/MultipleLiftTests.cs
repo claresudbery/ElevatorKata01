@@ -8,133 +8,48 @@ using NUnit.Framework;
 
 namespace ElevatorKata01.Tests.Tests
 {
-    /// <summary>
-    /// All the utility code is in ElevatorUtils.cs, so that the tests themselves can be kept separate.
-    /// </summary>
     [TestFixture]
-    public class MultipleLiftTests : ILiftMonitor
+    public class MultipleLiftTests
     {
-        private readonly List<LiftStatus> _liftStatuses = new List<LiftStatus>();
-        private readonly TestScheduler _testScheduler = new TestScheduler();
+        readonly LiftTestHelper _liftTestHelper = new LiftTestHelper();
 
         [Test]
         public void When_person_calls_lift_to_higher_floor_number_then_one_lift_will_start_moving_upwards()
         {
             // Arrange
-            _liftStatuses.Clear();
-
-            var liftManager = new LiftManager(_testScheduler);
-            liftManager.Subscribe(this);
-
-            var expectedLiftStatus = new ExpectedLiftStatus
-            {
-                StatusIndex = 0,
-                SecondsSinceTestStarted = TimeConstants.FloorInterval / 1000m,
-                Status = new LiftStatus
-                {
-                    CurrentDirection = Direction.Up,
-                    CurrentFloor = 0
-                }
-            };
+            _liftTestHelper.ManagerMakeStart();
 
             // Act
-            liftManager.MakeUpwardsRequestFrom(3);
-            _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds((double)(2 * expectedLiftStatus.SecondsSinceTestStarted * 1000)).Ticks);
+            _liftTestHelper.ManagerMakeUpwardsRequestFrom(Floors.Third, true);
+
+            _liftTestHelper.LiftExpectToLeaveFrom(Floors.Ground).Mark(Direction.Up);
+
+            _liftTestHelper.StartTest();
 
             // Assert
-            try
-            {
-                Assert.That(_liftStatuses.Count, Is.EqualTo(1));
-
-                Assert.That(
-                    _liftStatuses[0].CurrentDirection,
-                    Is.EqualTo(expectedLiftStatus.Status.CurrentDirection),
-                    "Floor " + expectedLiftStatus.Status.CurrentFloor
-                    + ", Direction " + expectedLiftStatus.Status.CurrentDirection
-                    + ", Index " + expectedLiftStatus.StatusIndex);
-
-                Assert.That(
-                    _liftStatuses[0].CurrentFloor,
-                    Is.EqualTo(expectedLiftStatus.Status.CurrentFloor),
-                    "Floor " + expectedLiftStatus.Status.CurrentFloor
-                    + ", Direction " + expectedLiftStatus.Status.CurrentDirection
-                    + ", Index " + expectedLiftStatus.StatusIndex);
-            }
-            finally
-            {
-                _testScheduler.Start();
-                liftManager.Dispose();
-            }
+            _liftTestHelper.VerifyAllMarkers();
         }
 
         [Test]
         public void When_person_calls_lift_to_lower_floor_number_then_one_lift_will_start_moving_downwards()
         {
             // Arrange
-            _liftStatuses.Clear();
-
-            var liftManager = new LiftManager(_testScheduler);
-            liftManager.Subscribe(this);
-
-            var expectedLiftStatus = new ExpectedLiftStatus
-            {
-                StatusIndex = 0,
-                SecondsSinceTestStarted = TimeConstants.FloorInterval / 1000m,
-                Status = new LiftStatus
-                {
-                    CurrentDirection = Direction.Down,
-                    CurrentFloor = 0
-                }
-            };
+            _liftTestHelper.ManagerMakeStart();
 
             // Act
-            liftManager.MakeDownwardsRequestFrom(-3);
-            _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds((double)(2 * expectedLiftStatus.SecondsSinceTestStarted * 1000)).Ticks);
+            _liftTestHelper.ManagerMakeDownwardsRequestFrom(-3, true);
+
+            _liftTestHelper.LiftExpectToLeaveFrom(Floors.Ground).Mark(Direction.Down);
+
+            _liftTestHelper.StartTest();
 
             // Assert
-            try
-            {
-                Assert.That(_liftStatuses.Count, Is.EqualTo(1));
-
-                Assert.That(
-                    _liftStatuses[0].CurrentDirection,
-                    Is.EqualTo(expectedLiftStatus.Status.CurrentDirection),
-                    "Floor " + expectedLiftStatus.Status.CurrentFloor
-                    + ", Direction " + expectedLiftStatus.Status.CurrentDirection
-                    + ", Index " + expectedLiftStatus.StatusIndex);
-
-                Assert.That(
-                    _liftStatuses[0].CurrentFloor,
-                    Is.EqualTo(expectedLiftStatus.Status.CurrentFloor),
-                    "Floor " + expectedLiftStatus.Status.CurrentFloor
-                    + ", Direction " + expectedLiftStatus.Status.CurrentDirection
-                    + ", Index " + expectedLiftStatus.StatusIndex);
-            }
-            finally
-            {
-                _testScheduler.Start();
-                liftManager.Dispose();
-            }
+            _liftTestHelper.VerifyAllMarkers();
         }
 
         [Test]
         public void Given_one_lift_is_moving_upwards__When_someone_makes_a_downwards_request__Then_a_second_lift_will_service_the_downwards_request()
         {
-        }
-
-        public void OnNext(LiftStatus currentLiftStatus)
-        {
-            _liftStatuses.Add(currentLiftStatus);
-        }
-
-        public void OnError(Exception error)
-        {
-            // Do nothing
-        }
-
-        public void OnCompleted()
-        {
-            // Do nothing
         }
     }
 }

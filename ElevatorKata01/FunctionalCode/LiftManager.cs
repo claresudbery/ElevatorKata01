@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using ElevatorKata01.Elements;
-using ElevatorKata01.FunctionalCode;
 
-namespace ElevatorKata01.Tests.Tests
+namespace ElevatorKata01.FunctionalCode
 {
-    public class LiftManager : IObservable<LiftStatus>, IDisposable, IObserver<LiftStatus>
+    public class LiftManager : IObservable<LiftStatus>, IDisposable, IObserver<LiftStatus>, ILiftRequestHandler
     {
         private readonly List<IObserver<LiftStatus>> _observers = new List<IObserver<LiftStatus>>();
         private readonly IScheduler _scheduler;

@@ -7,7 +7,7 @@ using ElevatorKata01.Elements;
 
 namespace ElevatorKata01.FunctionalCode
 {
-    public class ObservableLift : IObservable<LiftStatus>, IDisposable
+    public class ObservableLift : IObservable<LiftStatus>, IDisposable, ILiftRequestHandler
     {
         private readonly List<IObserver<LiftStatus>> _observers = new List<IObserver<LiftStatus>>();
         private int _currentFloor;

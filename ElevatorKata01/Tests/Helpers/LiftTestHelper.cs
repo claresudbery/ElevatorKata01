@@ -3,18 +3,11 @@ using System.Collections.Generic;
 using System.Reactive.Concurrency;
 using ElevatorKata01.Elements;
 using ElevatorKata01.FunctionalCode;
-using ElevatorKata01.Tests.Helpers;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 
-// ReSharper disable CheckNamespace 
-// - this is test helper code but not actual test code, so I don't want it in the Tests folder
-namespace ElevatorKata01.Tests.Tests
-// ReSharper restore CheckNamespace
+namespace ElevatorKata01.Tests.Helpers
 {
-    /// <summary>
-    /// All the utility code is in here, so that the tests themselves can be kept separate.
-    /// </summary>
     public class LiftTestHelper : ILiftMonitor
     {
         private readonly List<LiftStatus> _liftStatuses = new List<LiftStatus>();
@@ -22,6 +15,7 @@ namespace ElevatorKata01.Tests.Tests
 
         private readonly TestScheduler _testScheduler = new TestScheduler();
         private ObservableLift _theLift;
+        private LiftManager _theLiftManager;
         private int _millisecondsSinceTestStarted;
         private int _millisecondsTakenByMostRecentEvent;
         private int _numExpectedStatuses;
@@ -56,7 +50,14 @@ namespace ElevatorKata01.Tests.Tests
             finally
             {
                 EnsureThatAllScheduledEventsAreRunThroughToCompletion();
-                _theLift.Dispose();
+                if (_theLift != null)
+                {
+                    _theLift.Dispose();
+                }
+                if (_theLiftManager != null)
+                {
+                    _theLiftManager.Dispose();
+                }
                 _testStarted = false;
             }
         }
@@ -98,20 +99,40 @@ namespace ElevatorKata01.Tests.Tests
                 () => _theLift.MoveTo(floor));
         }
 
-        public void LiftMakeDownwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
+        public void MakeDownwardsRequestFrom(ILiftRequestHandler liftRequestHandler, int floor, bool shouldBeActedUponImmediately)
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
             Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
-                () => _theLift.MakeDownwardsRequestFrom(floor));
+                () => liftRequestHandler.MakeDownwardsRequestFrom(floor));
+        }
+
+        public void MakeUpwardsRequestFrom(ILiftRequestHandler liftRequestHandler, int floor, bool shouldBeActedUponImmediately)
+        {
+            AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
+
+            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
+                () => liftRequestHandler.MakeUpwardsRequestFrom(floor));
+        }
+
+        public void LiftMakeDownwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
+        {
+            MakeDownwardsRequestFrom(_theLift, floor, shouldBeActedUponImmediately);
         }
 
         public void LiftMakeUpwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
         {
-            AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
+            MakeUpwardsRequestFrom(_theLift, floor, shouldBeActedUponImmediately);
+        }
 
-            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
-                () => _theLift.MakeUpwardsRequestFrom(floor));
+        public void ManagerMakeDownwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
+        {
+            MakeDownwardsRequestFrom(_theLiftManager, floor, shouldBeActedUponImmediately);
+        }
+
+        public void ManagerMakeUpwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
+        {
+            MakeUpwardsRequestFrom(_theLiftManager, floor, shouldBeActedUponImmediately);
         }
 
         private void AmendMostRecentEventTimeIfNecessary(bool shouldBeActedUponImmediately)
@@ -144,7 +165,7 @@ namespace ElevatorKata01.Tests.Tests
             return this;
         }
 
-        public void LiftMakeStartAt(int floor)
+        public void InitialiseTestData()
         {
             _liftStatuses.Clear();
             _expectedLiftStatuses.Clear();
@@ -152,9 +173,22 @@ namespace ElevatorKata01.Tests.Tests
             _millisecondsSinceTestStarted = TimeConstants.FloorInterval;
             _millisecondsTakenByMostRecentEvent = 0;
             _numExpectedStatuses = 0;
+        }
+
+        public void LiftMakeStartAt(int floor)
+        {
+            InitialiseTestData();
 
             _theLift = new ObservableLift(floor, _testScheduler);
             _theLift.Subscribe(this);
+        }
+
+        public void ManagerMakeStart()
+        {
+            InitialiseTestData();
+
+            _theLiftManager = new LiftManager(_testScheduler);
+            _theLiftManager.Subscribe(this);
         }
 
         public void OnNext(LiftStatus currentLiftStatus)

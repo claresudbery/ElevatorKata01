@@ -1,16 +1,14 @@
 ﻿using ElevatorKata01.Elements;
 using ElevatorKata01.FunctionalCode;
+using ElevatorKata01.Tests.Helpers;
 using NUnit.Framework;
 
 namespace ElevatorKata01.Tests.Tests
 {
-    /// <summary>
-    /// All the utility code is in ElevatorUtils.cs, so that the tests themselves can be kept separate.
-    /// </summary>
     [TestFixture]
-    public partial class SingleLiftTests
+    public class SingleLiftTests
     {
-        LiftTestHelper _liftTestHelper = new LiftTestHelper();
+        readonly LiftTestHelper _liftTestHelper = new LiftTestHelper();
 
         private const int GroundFloor = 0;
         private const int FirstFloor = 1;

@@ -82,7 +82,9 @@
     <Compile Include="Elements\ILiftMonitor.cs" />
     <Compile Include="Elements\LiftStatus.cs" />
     <Compile Include="Elements\Direction.cs" />
-    <Compile Include="Tests\Tests\LiftManager.cs" />
+    <Compile Include="FunctionalCode\ILiftRequestHandler.cs" />
+    <Compile Include="Elements\Floors.cs" />
+    <Compile Include="FunctionalCode\LiftManager.cs" />
     <Compile Include="Tests\Tests\MultipleLiftTests.cs" />
     <Compile Include="Tests\Tests\SingleLiftTests.cs" />
     <Compile Include="FunctionalCode\ObservableLift.cs" />
