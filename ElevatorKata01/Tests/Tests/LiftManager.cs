@@ -39,11 +39,16 @@ namespace ElevatorKata01.Tests.Tests
             _theLift.MakeUpwardsRequestFrom(destinationFloor);
         }
 
-        public void OnNext(LiftStatus value)
+        public void MakeDownwardsRequestFrom(int destinationFloor)
+        {
+            _theLift.MakeDownwardsRequestFrom(destinationFloor);
+        }
+
+        public void OnNext(LiftStatus liftStatus)
         {
             foreach (var observer in _observers)
             {
-                observer.OnNext(value);
+                observer.OnNext(liftStatus);
             }
         }
 
