@@ -15,18 +15,10 @@ namespace ElevatorKata01.Tests.Tests
     /// <summary>
     /// All the utility code is in here, so that the tests themselves can be kept separate.
     /// </summary>
-    public partial class SingleLiftTests : ILiftMonitor
+    public class LiftTestHelper : ILiftMonitor
     {
         private readonly List<LiftStatus> _liftStatuses = new List<LiftStatus>();
         private readonly List<ExpectedLiftStatus> _expectedLiftStatuses = new List<ExpectedLiftStatus>();
-
-        private const int GroundFloor = 0;
-        private const int FirstFloor = 1;
-        private const int SecondFloor = 2;
-        private const int ThirdFloor = 3;
-        private const int FourthFloor = 4;
-        private const int FifthFloor = 5;
-        private const int SixthFloor = 6;
 
         private readonly TestScheduler _testScheduler = new TestScheduler();
         private ObservableLift _theLift;
@@ -36,7 +28,7 @@ namespace ElevatorKata01.Tests.Tests
         private int _currentLiftFloor;
         private bool _testStarted = false;
 
-        private void VerifyAllMarkers()
+        public void VerifyAllMarkers()
         {
             try
             {
@@ -74,7 +66,7 @@ namespace ElevatorKata01.Tests.Tests
             _testScheduler.Start();
         }
 
-        private void Mark(Direction direction)
+        public void Mark(Direction direction)
         {
             _expectedLiftStatuses.Add(new ExpectedLiftStatus
             {
@@ -88,7 +80,7 @@ namespace ElevatorKata01.Tests.Tests
             });
         }
 
-        private void StartTest()
+        public void StartTest()
         {
             _testStarted = true;
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
@@ -96,7 +88,7 @@ namespace ElevatorKata01.Tests.Tests
             _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted).Ticks);
         }
 
-        private void LiftMakeRequestToMoveTo(int floor, bool shouldBeActedUponImmediately)
+        public void LiftMakeRequestToMoveTo(int floor, bool shouldBeActedUponImmediately)
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
@@ -106,7 +98,7 @@ namespace ElevatorKata01.Tests.Tests
                 () => _theLift.MoveTo(floor));
         }
 
-        private void LiftMakeDownwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
+        public void LiftMakeDownwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
@@ -114,7 +106,7 @@ namespace ElevatorKata01.Tests.Tests
                 () => _theLift.MakeDownwardsRequestFrom(floor));
         }
 
-        private void LiftMakeUpwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
+        public void LiftMakeUpwardsRequestFrom(int floor, bool shouldBeActedUponImmediately)
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
@@ -129,7 +121,7 @@ namespace ElevatorKata01.Tests.Tests
                 : _millisecondsTakenByMostRecentEvent;
         }
 
-        private SingleLiftTests LiftExpectToStopAt(int floor)
+        public LiftTestHelper LiftExpectToStopAt(int floor)
         {
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
             _millisecondsTakenByMostRecentEvent = TimeConstants.WaitTime + TimeConstants.FloorInterval;
@@ -138,12 +130,12 @@ namespace ElevatorKata01.Tests.Tests
             return this;
         }
 
-        private SingleLiftTests LiftExpectToLeaveFrom(int floor)
+        public LiftTestHelper LiftExpectToLeaveFrom(int floor)
         {
             return LiftExpectToVisit(floor);
         }
 
-        private SingleLiftTests LiftExpectToVisit(int floor)
+        public LiftTestHelper LiftExpectToVisit(int floor)
         {
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
             _millisecondsTakenByMostRecentEvent = TimeConstants.FloorInterval;
@@ -152,7 +144,7 @@ namespace ElevatorKata01.Tests.Tests
             return this;
         }
 
-        private void LiftMakeStartAt(int floor)
+        public void LiftMakeStartAt(int floor)
         {
             _liftStatuses.Clear();
             _expectedLiftStatuses.Clear();

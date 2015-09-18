@@ -117,6 +117,11 @@ namespace ElevatorKata01.Tests.Tests
             }
         }
 
+        [Test]
+        public void Given_one_lift_is_moving_upwards__When_someone_makes_a_downwards_request__Then_a_second_lift_will_service_the_downwards_request()
+        {
+        }
+
         public void OnNext(LiftStatus currentLiftStatus)
         {
             _liftStatuses.Add(currentLiftStatus);
