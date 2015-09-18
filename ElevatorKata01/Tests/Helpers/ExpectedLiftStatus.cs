@@ -7,6 +7,5 @@ namespace ElevatorKata01.Tests.Helpers
         public int StatusIndex;
         public LiftStatus Status;
         public decimal SecondsSinceTestStarted;
-        public int LiftNumber;
     }
 }
