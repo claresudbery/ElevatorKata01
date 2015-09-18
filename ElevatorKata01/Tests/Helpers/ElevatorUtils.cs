@@ -42,7 +42,7 @@ namespace ElevatorKata01.Tests.Tests
             {
                 Assert.That(_testStarted, Is.EqualTo(true), "Test scheduler was never kicked off!");
                 Assert.That(_liftStatuses.Count, Is.EqualTo(_numExpectedStatuses));
-                Assert.That(_expectedLiftStatuses.Count, Is.GreaterThan(1), "No expected events were marked for testing!");
+                Assert.That(_expectedLiftStatuses.Count, Is.GreaterThan(0), "No expected events were marked for testing!");
 
                 foreach (var expectedStatus in _expectedLiftStatuses)
                 {
