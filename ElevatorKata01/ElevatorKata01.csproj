@@ -85,13 +85,14 @@
     <Compile Include="FunctionalCode\ILiftRequestHandler.cs" />
     <Compile Include="Elements\Floors.cs" />
     <Compile Include="FunctionalCode\LiftManager.cs" />
+    <Compile Include="Tests\Helpers\LiftManagerTestHelper.cs" />
     <Compile Include="Tests\Tests\MultipleLiftTests.cs" />
     <Compile Include="Tests\Tests\SingleLiftTests.cs" />
     <Compile Include="FunctionalCode\ObservableLift.cs" />
     <Compile Include="FunctionalCode\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Elements\TimeConstants.cs" />
-    <Compile Include="Tests\Helpers\LiftTestHelper.cs" />
+    <Compile Include="Tests\Helpers\IndividualLiftTestHelper.cs" />
     <Compile Include="Tests\Helpers\ExpectedLiftStatus.cs" />
   </ItemGroup>
   <ItemGroup>

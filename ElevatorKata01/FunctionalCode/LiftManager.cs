@@ -5,17 +5,17 @@ using ElevatorKata01.Elements;
 
 namespace ElevatorKata01.FunctionalCode
 {
-    public class LiftManager : IObservable<LiftStatus>, IDisposable, IObserver<LiftStatus>, ILiftRequestHandler
+    public class LiftManager : IObservable<LiftStatus>, IDisposable, ILiftMonitor, ILiftRequestHandler
     {
         private readonly List<IObserver<LiftStatus>> _observers = new List<IObserver<LiftStatus>>();
         private readonly IScheduler _scheduler;
-        private ObservableLift _theLift;
+        private readonly List<ObservableLift> _theLifts = new List<ObservableLift>();
 
-        public LiftManager(IScheduler scheduler)
+        public LiftManager(IScheduler scheduler, List<string> liftNames)
         {
             _scheduler = scheduler;
-            _theLift = new ObservableLift(0, scheduler);
-            _theLift.Subscribe(this);
+            _theLifts.Add(new ObservableLift(0, scheduler));
+            _theLifts[0].Subscribe(this);
         }
 
         public IDisposable Subscribe(IObserver<LiftStatus> observer)
@@ -26,7 +26,7 @@ namespace ElevatorKata01.FunctionalCode
 
         public void Dispose()
         {
-            _theLift.Dispose();
+            _theLifts[0].Dispose();
             foreach (var observer in _observers)
             {
                 observer.OnCompleted();
@@ -35,12 +35,12 @@ namespace ElevatorKata01.FunctionalCode
 
         public void MakeUpwardsRequestFrom(int destinationFloor)
         {
-            _theLift.MakeUpwardsRequestFrom(destinationFloor);
+            _theLifts[0].MakeUpwardsRequestFrom(destinationFloor);
         }
 
         public void MakeDownwardsRequestFrom(int destinationFloor)
         {
-            _theLift.MakeDownwardsRequestFrom(destinationFloor);
+            _theLifts[0].MakeDownwardsRequestFrom(destinationFloor);
         }
 
         public void OnNext(LiftStatus liftStatus)

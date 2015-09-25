@@ -7,5 +7,6 @@ namespace ElevatorKata01.Elements
         public Direction CurrentDirection;
         public int CurrentFloor;
         public TimeSpan Timestamp;
+        public string LiftName;
     }
 }

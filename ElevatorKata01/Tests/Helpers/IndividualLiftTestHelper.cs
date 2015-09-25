@@ -8,57 +8,47 @@ using NUnit.Framework;
 
 namespace ElevatorKata01.Tests.Helpers
 {
-    public class LiftTestHelper : ILiftMonitor
+    public class IndividualLiftTestHelper : ILiftMonitor
     {
         private readonly List<LiftStatus> _liftStatuses = new List<LiftStatus>();
         private readonly List<ExpectedLiftStatus> _expectedLiftStatuses = new List<ExpectedLiftStatus>();
 
-        private readonly TestScheduler _testScheduler = new TestScheduler();
+        private readonly TestScheduler _testScheduler;
         private ObservableLift _theLift;
-        private LiftManager _theLiftManager;
         private int _millisecondsSinceTestStarted;
         private int _millisecondsTakenByMostRecentEvent;
         private int _numExpectedStatuses;
         private int _currentLiftFloor;
-        private bool _testStarted = false;
+        //private bool _testStarted = false;
+
+        public string LiftName { get; private set; }
+
+        public IndividualLiftTestHelper(string liftName, TestScheduler testScheduler)
+        {
+            LiftName = liftName;
+            _testScheduler = testScheduler;
+        }
 
         public void VerifyAllMarkers()
         {
-            try
-            {
-                Assert.That(_testStarted, Is.EqualTo(true), "Test scheduler was never kicked off!");
-                Assert.That(_liftStatuses.Count, Is.EqualTo(_numExpectedStatuses));
-                Assert.That(_expectedLiftStatuses.Count, Is.GreaterThan(0), "No expected events were marked for testing!");
+            Assert.That(_liftStatuses.Count, Is.EqualTo(_numExpectedStatuses));
+            Assert.That(_expectedLiftStatuses.Count, Is.GreaterThan(0), "No expected events were marked for testing!");
 
-                foreach (var expectedStatus in _expectedLiftStatuses)
-                {
-                    Assert.That(
-                        _liftStatuses[expectedStatus.StatusIndex].CurrentDirection, 
-                        Is.EqualTo(expectedStatus.Status.CurrentDirection),
-                        "Floor " + expectedStatus.Status.CurrentFloor
-                            + ", Direction " + expectedStatus.Status.CurrentDirection 
-                            + ", Index " + expectedStatus.StatusIndex);
-
-                    Assert.That(
-                        _liftStatuses[expectedStatus.StatusIndex].CurrentFloor, 
-                        Is.EqualTo(expectedStatus.Status.CurrentFloor),
-                        "Floor " + expectedStatus.Status.CurrentFloor
-                            + ", Direction " + expectedStatus.Status.CurrentDirection 
-                            + ", Index " + expectedStatus.StatusIndex);
-                }
-            }
-            finally
+            foreach (var expectedStatus in _expectedLiftStatuses)
             {
-                EnsureThatAllScheduledEventsAreRunThroughToCompletion();
-                if (_theLift != null)
-                {
-                    _theLift.Dispose();
-                }
-                if (_theLiftManager != null)
-                {
-                    _theLiftManager.Dispose();
-                }
-                _testStarted = false;
+                Assert.That(
+                    _liftStatuses[expectedStatus.StatusIndex].CurrentDirection, 
+                    Is.EqualTo(expectedStatus.Status.CurrentDirection),
+                    "Floor " + expectedStatus.Status.CurrentFloor
+                        + ", Direction " + expectedStatus.Status.CurrentDirection 
+                        + ", Index " + expectedStatus.StatusIndex);
+
+                Assert.That(
+                    _liftStatuses[expectedStatus.StatusIndex].CurrentFloor, 
+                    Is.EqualTo(expectedStatus.Status.CurrentFloor),
+                    "Floor " + expectedStatus.Status.CurrentFloor
+                        + ", Direction " + expectedStatus.Status.CurrentDirection 
+                        + ", Index " + expectedStatus.StatusIndex);
             }
         }
 
@@ -142,6 +132,11 @@ namespace ElevatorKata01.Tests.Helpers
                 : _millisecondsTakenByMostRecentEvent;
         }
 
+        public LiftTestHelper Lift(string liftName)
+        {
+            return this;
+        }
+
         public LiftTestHelper LiftExpectToStopAt(int floor)
         {
             _millisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
@@ -183,11 +178,11 @@ namespace ElevatorKata01.Tests.Helpers
             _theLift.Subscribe(this);
         }
 
-        public void ManagerMakeStart()
+        public void ManagerMakeStart(List<string> liftNames)
         {
             InitialiseTestData();
 
-            _theLiftManager = new LiftManager(_testScheduler);
+            _theLiftManager = new LiftManager(_testScheduler, liftNames);
             _theLiftManager.Subscribe(this);
         }
 
@@ -204,6 +199,14 @@ namespace ElevatorKata01.Tests.Helpers
         public void OnCompleted()
         {
             // Do nothing
+        }
+
+        public void DisposeLift()
+        {
+            if (_theLift != null)
+            {
+                _theLift.Dispose();
+            }
         }
     }
 }
