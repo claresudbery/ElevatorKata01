@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Concurrency;
+using System.Security.Cryptography.X509Certificates;
 using ElevatorKata01.Elements;
 
 namespace ElevatorKata01.FunctionalCode
@@ -8,14 +10,16 @@ namespace ElevatorKata01.FunctionalCode
     public class LiftManager : IObservable<LiftStatus>, IDisposable, ILiftMonitor, ILiftRequestHandler
     {
         private readonly List<IObserver<LiftStatus>> _observers = new List<IObserver<LiftStatus>>();
-        private readonly IScheduler _scheduler;
         private readonly List<ObservableLift> _theLifts = new List<ObservableLift>();
 
         public LiftManager(IScheduler scheduler, List<string> liftNames)
         {
-            _scheduler = scheduler;
-            _theLifts.Add(new ObservableLift(0, scheduler));
-            _theLifts[0].Subscribe(this);
+            foreach (string liftName in liftNames)
+            {
+                var newLift = new ObservableLift(0, scheduler, liftName);
+                _theLifts.Add(newLift);
+                newLift.Subscribe(this);
+            }
         }
 
         public IDisposable Subscribe(IObserver<LiftStatus> observer)
@@ -26,8 +30,12 @@ namespace ElevatorKata01.FunctionalCode
 
         public void Dispose()
         {
-            _theLifts[0].Dispose();
-            foreach (var observer in _observers)
+            foreach (ObservableLift lift in _theLifts)
+            {
+                lift.Dispose();
+            }
+
+            foreach (IObserver<LiftStatus> observer in _observers)
             {
                 observer.OnCompleted();
             }
@@ -35,12 +43,12 @@ namespace ElevatorKata01.FunctionalCode
 
         public void MakeUpwardsRequestFrom(int destinationFloor)
         {
-            _theLifts[0].MakeUpwardsRequestFrom(destinationFloor);
+            _theLifts.First(x => x.NotProcessingAnyRequests).MakeUpwardsRequestFrom(destinationFloor);
         }
 
         public void MakeDownwardsRequestFrom(int destinationFloor)
         {
-            _theLifts[0].MakeDownwardsRequestFrom(destinationFloor);
+            _theLifts.First(x => x.NotProcessingAnyRequests).MakeDownwardsRequestFrom(destinationFloor);
         }
 
         public void OnNext(LiftStatus liftStatus)

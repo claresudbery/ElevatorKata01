@@ -18,17 +18,19 @@ namespace ElevatorKata01.FunctionalCode
         private readonly List<int> _goingUp = new List<int>();
         private readonly List<int> _goingDown = new List<int>();
         private readonly IScheduler _scheduler;
+        private readonly string _liftName;
         private const int GroundFloor = 0;
 
         private delegate void FloorOperator(int floor);
         private delegate int FloorReturner();
 
-        public ObservableLift(int startingFloor, IScheduler scheduler)
+        public ObservableLift(int startingFloor, IScheduler scheduler, string liftName)
         {
             _currentFloor = startingFloor;
             _currentDirectionBeingProcessed = Direction.None;
             _currentDirectionActuallyMovingIn = Direction.None;
             _scheduler = scheduler;
+            _liftName = liftName;
             WaitForNextInstruction();
         }
 
@@ -246,7 +248,8 @@ namespace ElevatorKata01.FunctionalCode
                     {
                         CurrentDirection = _currentDirectionActuallyMovingIn,
                         CurrentFloor = _currentFloor,
-                        Timestamp = _scheduler.Now.TimeOfDay
+                        Timestamp = _scheduler.Now.TimeOfDay,
+                        LiftName = _liftName
                     }
                 );
             }
@@ -292,6 +295,14 @@ namespace ElevatorKata01.FunctionalCode
             get
             {
                 return (_currentDirectionActuallyMovingIn == Direction.None);
+            }
+        }
+
+        public bool NotProcessingAnyRequests
+        {
+            get
+            {
+                return (_currentDirectionBeingProcessed == Direction.None);
             }
         }
 

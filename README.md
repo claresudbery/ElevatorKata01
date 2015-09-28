@@ -144,3 +144,38 @@ Possible technologies for a UI:
 	recommended by Google:
 		Xamarin (based on my own quick Googling re what I could use to generate an app for Android and iOS, but using languages / technologies I already know (ie C# and Visual Studio))
 			Details here: http://nnish.com/2013/06/12/how-i-built-an-android-app-in-c-visual-studio-in-less-than-24hrs/
+			
+Multiple lifts:
+	Make start:
+		Both lifts: _millisecondsSinceTestStarted = 1000
+	Manager gets upwards request from 3
+		_millisecondsTakenByMostRecentEvent = 1500
+		schedule a "MakeUpwardsRequest" event for 1500 ms
+	Lift A leaves the ground floor
+		Lift A: _millisecondsSinceTestStarted gets 1500 added on (= 2500)
+		Lift A: _millisecondsTakenByMostRecentEvent = 1000
+	Manager gets downwards request from 2
+		_millisecondsTakenByMostRecentEvent = 1500
+		schedule a "MakeDownwardsRequest" event for 3000 ms
+	Lift B leaves the ground floor
+		Lift B: _millisecondsSinceTestStarted gets 1500 added on (= 2500)
+		Lift B: _millisecondsTakenByMostRecentEvent = 1000
+		
+	1.5: make upwards request from 3
+	2.5: Lift A leaves ground floor
+	3.5: Lift A visits 1st floor
+	4.5: Lift A visits 2nd floor
+	5.5: Lift A stops at 3rd floor
+	
+	3: Downwards request from 5
+	4: Lift B leaves ground floor
+	5: Lift B visits 1st floor
+	6: Lift B visits 2nd floor
+	7: Lift B visits 3rd floor
+	8: Lift B visits 4th floor
+	9: Lift B stops at 5th floor
+
+TO DO:
+	ManagerMakeDownwardsRequestFrom: Now has two "expected" values: 
+		shouldBeActedUponImmediately and expectedLiftName - so really these should somehow go into some kind of Expect method,
+		rather than a Make method?
