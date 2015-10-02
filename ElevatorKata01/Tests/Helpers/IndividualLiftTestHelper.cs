@@ -39,26 +39,29 @@ namespace ElevatorKata01.Tests.Helpers
             if (_anyExpectations)
             {
                 Assert.That(_liftStatuses.Count, Is.EqualTo(_numExpectedStatuses));
-                Assert.That(_expectedLiftStatuses.Count, Is.GreaterThan(0), "No expected events were marked for testing!");
-            }
+                if (_numExpectedStatuses != 0)
+                {
+                    Assert.That(_expectedLiftStatuses.Count, Is.GreaterThan(0), "No expected events were marked for testing!");
+                }
 
-            foreach (var expectedStatus in _expectedLiftStatuses)
-            {
-                Assert.That(
-                    _liftStatuses[expectedStatus.StatusIndex].CurrentDirection, 
-                    Is.EqualTo(expectedStatus.Status.CurrentDirection),
-                    "Floor " + expectedStatus.Status.CurrentFloor
-                        + ", Direction " + expectedStatus.Status.CurrentDirection
-                        + ", Index " + expectedStatus.StatusIndex
-                        + ", Name " + LiftName);
+                foreach (var expectedStatus in _expectedLiftStatuses)
+                {
+                    Assert.That(
+                        _liftStatuses[expectedStatus.StatusIndex].CurrentDirection, 
+                        Is.EqualTo(expectedStatus.Status.CurrentDirection),
+                        "Floor " + expectedStatus.Status.CurrentFloor
+                            + ", Direction " + expectedStatus.Status.CurrentDirection
+                            + ", Index " + expectedStatus.StatusIndex
+                            + ", Name " + LiftName);
 
-                Assert.That(
-                    _liftStatuses[expectedStatus.StatusIndex].CurrentFloor, 
-                    Is.EqualTo(expectedStatus.Status.CurrentFloor),
-                    "Bad floor num: Floor " + expectedStatus.Status.CurrentFloor
-                        + ", Direction " + expectedStatus.Status.CurrentDirection
-                        + ", Index " + expectedStatus.StatusIndex
-                        + ", Name " + LiftName);
+                    Assert.That(
+                        _liftStatuses[expectedStatus.StatusIndex].CurrentFloor, 
+                        Is.EqualTo(expectedStatus.Status.CurrentFloor),
+                        "Bad floor num: Floor " + expectedStatus.Status.CurrentFloor
+                            + ", Direction " + expectedStatus.Status.CurrentDirection
+                            + ", Index " + expectedStatus.StatusIndex
+                            + ", Name " + LiftName);
+                }
             }
         }
 
@@ -154,6 +157,11 @@ namespace ElevatorKata01.Tests.Helpers
             _numExpectedStatuses++;
             _currentLiftFloor = floor;
             return this;
+        }
+
+        public void ExpectToStayStill()
+        {
+            _numExpectedStatuses = 0;
         }
 
         public IndividualLiftTestHelper ExpectToLeaveFrom(int floor)
