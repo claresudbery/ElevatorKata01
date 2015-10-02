@@ -241,3 +241,7 @@ TO DO:
 	ManagerMakeDownwardsRequestFrom: Now has two "expected" values: 
 		shouldBeActedUponImmediately and expectedLiftName - so really these should somehow go into some kind of Expect method,
 		rather than a Make method?
+		
+QUS FOR XPMAN:
+	Are my tests actually acceptance tests? 
+		Should I have simpler unit tests which simply test the logic of individual lift methods?
