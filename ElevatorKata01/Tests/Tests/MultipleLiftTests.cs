@@ -115,6 +115,40 @@ namespace ElevatorKata01.Tests.Tests
         }
 
         [Test]
+        public void Given_one_lift_is_moving_and_one_is_not__When_a_new_request_comes_in__Then_the_stationary_lift_will_service_that_request_if_it_can_get_there_quickest()
+        {
+            // Arrange
+            const string liftForPoorlyDragons = "Lift for Poorly Dragons";
+            const string portalToAnotherDimension = "Portal to Another Dimension";
+
+            var liftNames = new List<string> { liftForPoorlyDragons, portalToAnotherDimension };
+            _liftManagerTestHelper.MakeStart(liftNames);
+
+            // Act
+            _liftManagerTestHelper.MakeUpwardsRequestFrom(Floors.Fifth, shouldBeActedUponImmediately: true, expectedLiftName: liftForPoorlyDragons);
+
+            _liftManagerTestHelper.Lift(liftForPoorlyDragons).ExpectToLeaveFrom(Floors.Ground);
+            _liftManagerTestHelper.Lift(liftForPoorlyDragons).ExpectToVisit(Floors.First);
+            _liftManagerTestHelper.Lift(liftForPoorlyDragons).ExpectToVisit(Floors.Second);
+            _liftManagerTestHelper.Lift(liftForPoorlyDragons).ExpectToVisit(Floors.Third);
+
+            _liftManagerTestHelper.MakeUpwardsRequestFrom(
+                Floors.First, 
+                shouldBeActedUponImmediately: true, 
+                expectedLiftName: portalToAnotherDimension,
+                liftWasPreviouslyIdle: true);
+            
+            _liftManagerTestHelper.Lift(portalToAnotherDimension).ExpectToLeaveFrom(Floors.Ground).Mark(Direction.Up);
+            
+            _liftManagerTestHelper.Lift(liftForPoorlyDragons).NoExpectations();
+            
+            _liftManagerTestHelper.StartTest();
+
+            // Assert
+            _liftManagerTestHelper.VerifyAllMarkers();
+        }
+
+        [Test]
         public void Given_all_four_lifts_are_moving__When_a_new_request_comes_in__Then_the_lift_which_can_get_there_quickest_will_service_that_request()
         {
             // NOT WRITTEN YET!
