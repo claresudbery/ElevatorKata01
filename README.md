@@ -87,6 +87,8 @@ Note that the basic algorithm being used at this point is pretty simple:
 			(and there is probably a danger that some poor person would get left stranded on the top floor because fetching them would never represent the most efficient use of the resource)
 	
 Tests which might need writing:
+Multiple lifts: When people make 'move' requests that are opposite direction to their initial 'call' request,
+	the lift will still honour their request once it has finished going in the other direction.
 If the lift runs out of upwards requests 
 	... and starts processing downwards requests...
 	... but the next downwards request is coming from a higher floor...
@@ -102,7 +104,6 @@ If the lift runs out of upwards requests
 			For now I'm leaving this with the status quo - ie the new upwards request is ignored until all downwards requests are serviced
 			(I've written a test to check that this is indeed the case:
 			Given_lift_has_finished_up_requests_and_the_next_downwards_request_comes_from_higher_up_when_a_new_up_request_comes_in_while_travelling_to_the_down_request_then_the_up_request_will_be_ignored_until_later)
-Consider all test scenarios and make sure they include negative floor numbers.
 Simpler lift-stopping algorithm:
 	When the lift arrives at a floor it is supposed to stop at, either because it is picking someone up from there or because it is dropping someone off (or both),
 	it will wait a certain amount of time (during which we can assume it has opened and closed its doors) and then move on.

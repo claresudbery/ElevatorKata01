@@ -11,24 +11,24 @@ namespace ElevatorKata01.Tests.Tests
     [TestFixture]
     public class MultipleLiftTests
     {
-        readonly LiftManagerTestHelper _liftTestHelper = new LiftManagerTestHelper();
-
+        readonly LiftManagerTestHelper _liftManagerTestHelper = new LiftManagerTestHelper();
+       
         [Test]
         public void When_person_calls_lift_to_higher_floor_number_then_one_lift_will_start_moving_upwards()
         {
             // Arrange
             const string liftName = "Lift A";
-            _liftTestHelper.MakeStart(new List<string> { liftName });
+            _liftManagerTestHelper.MakeStart(new List<string> { liftName });
 
             // Act
-            _liftTestHelper.MakeUpwardsRequestFrom(Floors.Third, shouldBeActedUponImmediately: true, expectedLiftName: liftName);
+            _liftManagerTestHelper.MakeUpwardsRequestFrom(Floors.Third, shouldBeActedUponImmediately: true, expectedLiftName: liftName);
 
-            _liftTestHelper.Lift(liftName).ExpectToLeaveFrom(Floors.Ground).Mark(Direction.Up);
+            _liftManagerTestHelper.Lift(liftName).ExpectToLeaveFrom(Floors.Ground).Mark(Direction.Up);
 
-            _liftTestHelper.StartTest();
+            _liftManagerTestHelper.StartTest();
 
             // Assert
-            _liftTestHelper.VerifyAllMarkers();
+            _liftManagerTestHelper.VerifyAllMarkers();
         }
 
         [Test]
@@ -36,17 +36,17 @@ namespace ElevatorKata01.Tests.Tests
         {
             // Arrange
             const string liftName = "Lift A";
-            _liftTestHelper.MakeStart(new List<string> { liftName });
+            _liftManagerTestHelper.MakeStart(new List<string> { liftName });
 
             // Act
-            _liftTestHelper.MakeDownwardsRequestFrom(-3, shouldBeActedUponImmediately: true, expectedLiftName: liftName);
+            _liftManagerTestHelper.MakeDownwardsRequestFrom(-3, shouldBeActedUponImmediately: true, expectedLiftName: liftName);
 
-            _liftTestHelper.Lift(liftName).ExpectToLeaveFrom(Floors.Ground).Mark(Direction.Down);
+            _liftManagerTestHelper.Lift(liftName).ExpectToLeaveFrom(Floors.Ground).Mark(Direction.Down);
 
-            _liftTestHelper.StartTest();
+            _liftManagerTestHelper.StartTest();
 
             // Assert
-            _liftTestHelper.VerifyAllMarkers();
+            _liftManagerTestHelper.VerifyAllMarkers();
         }
 
         [Test]
@@ -57,27 +57,81 @@ namespace ElevatorKata01.Tests.Tests
             const string liftB = "Lift B";
 
             var liftNames = new List<string> {liftA, liftB};
-            _liftTestHelper.MakeStart(liftNames);
+            _liftManagerTestHelper.MakeStart(liftNames);
 
             // Act
-            _liftTestHelper.MakeUpwardsRequestFrom(3, shouldBeActedUponImmediately: true, expectedLiftName: liftA);
-            _liftTestHelper.Lift("Lift A").ExpectToLeaveFrom(Floors.Ground).Mark(Direction.Up);
+            _liftManagerTestHelper.MakeUpwardsRequestFrom(3, shouldBeActedUponImmediately: true, expectedLiftName: liftA);
+            _liftManagerTestHelper.Lift("Lift A").ExpectToLeaveFrom(Floors.Ground).Mark(Direction.Up);
 
-            _liftTestHelper.MakeDownwardsRequestFrom(2, shouldBeActedUponImmediately: true, expectedLiftName: liftB);
-            _liftTestHelper.Lift("Lift B").ExpectToLeaveFrom(Floors.Ground).Mark(Direction.Up);
+            _liftManagerTestHelper.MakeDownwardsRequestFrom(2, shouldBeActedUponImmediately: true, expectedLiftName: liftB);
+            _liftManagerTestHelper.Lift("Lift B").ExpectToLeaveFrom(Floors.Ground).Mark(Direction.Up);
 
-            _liftTestHelper.Lift("Lift A").ExpectToVisit(Floors.First).Mark(Direction.Up);
-            _liftTestHelper.Lift("Lift B").ExpectToVisit(Floors.First).Mark(Direction.Up);
+            _liftManagerTestHelper.Lift("Lift A").ExpectToVisit(Floors.First).Mark(Direction.Up);
+            _liftManagerTestHelper.Lift("Lift B").ExpectToVisit(Floors.First).Mark(Direction.Up);
 
-            _liftTestHelper.Lift("Lift A").ExpectToVisit(Floors.Second).Mark(Direction.Up);
-            _liftTestHelper.Lift("Lift B").ExpectToStopAt(Floors.Second).Mark(Direction.None);
+            _liftManagerTestHelper.Lift("Lift A").ExpectToVisit(Floors.Second).Mark(Direction.Up);
+            _liftManagerTestHelper.Lift("Lift B").ExpectToStopAt(Floors.Second).Mark(Direction.None);
 
-            _liftTestHelper.Lift("Lift A").ExpectToStopAt(Floors.Third).Mark(Direction.None);
+            _liftManagerTestHelper.Lift("Lift A").ExpectToStopAt(Floors.Third).Mark(Direction.None);
 
-            _liftTestHelper.StartTest();
+            _liftManagerTestHelper.StartTest();
 
             // Assert
-            _liftTestHelper.VerifyAllMarkers();
+            _liftManagerTestHelper.VerifyAllMarkers();
+        }
+
+        [Test]
+        public void Given_one_lift_is_moving_downwards__When_someone_makes_an_upwards_request__Then_a_second_lift_will_service_the_upwards_request()
+        {
+            // Arrange
+            const string liftA = "Lift A";
+            const string liftB = "Lift B";
+
+            var liftNames = new List<string> { liftA, liftB };
+            _liftManagerTestHelper.MakeStart(liftNames);
+
+            // Act
+            _liftManagerTestHelper.MakeDownwardsRequestFrom(5, shouldBeActedUponImmediately: true, expectedLiftName: liftA);
+            _liftManagerTestHelper.Lift("Lift A").ExpectToLeaveFrom(Floors.Ground).Mark(Direction.Up);
+            _liftManagerTestHelper.Lift("Lift A").ExpectToVisit(Floors.First).Mark(Direction.Up);
+            _liftManagerTestHelper.Lift("Lift A").ExpectToVisit(Floors.Second).Mark(Direction.Up);
+            
+            _liftManagerTestHelper.MakeUpwardsRequestFrom(3, shouldBeActedUponImmediately: true, expectedLiftName: liftB);
+            _liftManagerTestHelper.Lift("Lift B").ExpectToLeaveFrom(Floors.Ground).Mark(Direction.Up);
+
+            _liftManagerTestHelper.Lift("Lift A").ExpectToVisit(Floors.Third).Mark(Direction.Up);
+            _liftManagerTestHelper.Lift("Lift B").ExpectToVisit(Floors.First).Mark(Direction.Up);
+
+            _liftManagerTestHelper.Lift("Lift A").ExpectToVisit(Floors.Fourth).Mark(Direction.Up);
+            _liftManagerTestHelper.Lift("Lift B").ExpectToVisit(Floors.Second).Mark(Direction.Up);
+
+            _liftManagerTestHelper.Lift("Lift A").ExpectToStopAt(Floors.Fifth).Mark(Direction.None);
+            _liftManagerTestHelper.Lift("Lift B").ExpectToStopAt(Floors.Third).Mark(Direction.None);
+
+            _liftManagerTestHelper.StartTest();
+
+            // Assert
+            _liftManagerTestHelper.VerifyAllMarkers();
+        }
+
+        [Test]
+        public void Given_four_lifts_are_all_moving__When_a_new_request_comes_in__Then_the_nearest_lift_moving_in_the_correct_direction_will_service_that_request()
+        {
+            // NOT WRITTEN YET!
+            // Arrange
+            const string liftA = "Lift A";
+            const string liftB = "Lift B";
+
+            var liftNames = new List<string> { liftA, liftB };
+            _liftManagerTestHelper.MakeStart(liftNames);
+
+            // Act
+            //_liftManagerTestHelper.MakeDownwardsRequestFrom(5, shouldBeActedUponImmediately: true, expectedLiftName: liftA);
+
+            _liftManagerTestHelper.StartTest();
+
+            // Assert
+            _liftManagerTestHelper.VerifyAllMarkers();
         }
     }
 }
