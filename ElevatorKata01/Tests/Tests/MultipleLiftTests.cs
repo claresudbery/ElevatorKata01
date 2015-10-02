@@ -149,6 +149,40 @@ namespace ElevatorKata01.Tests.Tests
         }
 
         [Test]
+        public void Given_one_lift_is_moving_and_one_is_not__When_a_new_request_comes_in__Then_the_moving_lift_will_service_that_request_if_it_can_get_there_quickest()
+        {
+            // Arrange
+            const string yoyoOno = "Yo-Yo Oh-No";
+            const string badlyLabelledToilet = "Badly Labelled Toilet";
+
+            var liftNames = new List<string> { yoyoOno, badlyLabelledToilet };
+            _liftManagerTestHelper.MakeStart(liftNames);
+
+            // Act
+            _liftManagerTestHelper.MakeUpwardsRequestFrom(Floors.Fifth, shouldBeActedUponImmediately: true, expectedLiftName: yoyoOno);
+
+            _liftManagerTestHelper.Lift(yoyoOno).ExpectToLeaveFrom(Floors.Ground);
+            _liftManagerTestHelper.Lift(yoyoOno).ExpectToVisit(Floors.First);
+            _liftManagerTestHelper.Lift(yoyoOno).ExpectToVisit(Floors.Second);
+            _liftManagerTestHelper.Lift(yoyoOno).ExpectToVisit(Floors.Third);
+
+            _liftManagerTestHelper.MakeUpwardsRequestFrom(
+                Floors.Fourth,
+                shouldBeActedUponImmediately: false,
+                expectedLiftName: yoyoOno,
+                liftWasPreviouslyIdle: false);
+
+            _liftManagerTestHelper.Lift(yoyoOno).ExpectToStopAt(Floors.Fourth).Mark(Direction.None);
+
+            _liftManagerTestHelper.Lift(badlyLabelledToilet).ExpectToStayStill();
+
+            _liftManagerTestHelper.StartTest();
+
+            // Assert
+            _liftManagerTestHelper.VerifyAllMarkers();
+        }
+
+        [Test]
         public void Given_all_four_lifts_are_moving__When_a_new_request_comes_in__Then_the_lift_which_can_get_there_quickest_will_service_that_request()
         {
             // NOT WRITTEN YET!
