@@ -86,9 +86,70 @@ Note that the basic algorithm being used at this point is pretty simple:
 			(although the definition of 'efficient' could presumably change depending on whose needs you are trying to satisfy)
 			(and there is probably a danger that some poor person would get left stranded on the top floor because fetching them would never represent the most efficient use of the resource)
 	
-Tests which might need writing:
-Multiple lifts: When people make 'move' requests that are opposite direction to their initial 'call' request,
-	the lift will still honour their request once it has finished going in the other direction.
+Multiple lifts - thoughts: 	
+	NB: We need to consider lift capacities.
+	NB: I've decided to ignore energy efficiency and focus purely on getting everyone from A to B as quickly as possible.
+	NB: The speed with which a lift can be expected respond to a request is calculated like this:
+		For every destination in the lift's list of destinations, 
+			it is assumed that the lift will spend 5 seconds at that destination
+				even though people getting out of lifts might be slightly quicker than people getting into lifts,
+				because the lift doesn't have to wait for them to make a move request
+		It is also assumed that the last destination in whatever the direction the lift is currently moving
+			is the last destination it will visit in that direction
+			(even though this may in fact change when someone new enters the lift and asks it to move somewhere else)
+		Time-to-destination is recalculated every time the lift is asked how long it would take 
+			(because the data will be constantly changing)
+		?? Will requests be taken away from lifts and reassigned to other players in response to changed circumstances?
+			Would it be better to just wait until each lift is passing a floor in a particular direction	
+				and then see whether they should stop for whoever happens to be waiting?
+				It would be interesting to compare this model where lift users are told in advance which lift they should use
+				- which would be most effective?
+				The problem with this approach would be that requests would not be assigned to a lift
+					until the lift is already moving
+					which might mean the lift never starts moving in the first place, because it is never given a request to service?
+					Maybe the lifts are given specific jobs to do if they are lying idle, 
+						but once all lifts are in motion, no new jobs are assigned until a lift is about to pass or arrive at the floor in question.
+						Also, although the general rule is that new jobs are always given to idle lifts,
+							there may be times when lifts already in flight are closer than lifts still on the ground floor
+							so we can't just assume that all new requests are given to idle lifts
+							then again, we could just send the idle lift off in that direction anyway
+							in case the other one gets held up
+							and then just wait to see who gets there first
+							... in which case, we might have the situ where four requests come in from floors 20, 21, 22 and 23
+							and all four lifts are sent in the same direction
+							but in fact just one of those lifts is able to service all four requests
+							and in the meantime some other requests come in from much lower down
+							at which point some or all of those lifts should be diverted
+							so maybe each lift is never given a destination, just a direction
+							and then it is told when to stop on an ad hoc basis?
+								although if this approach is followed, then as soon as someone enters the lift and tells it where to go,
+								the lift will have to have a concrete destination
+								in which case should the lift itself be responsible for maintaining at least this subset of destinations
+								or will that info be maintained by the lift manager?
+							this should be part of a separate strategy
+							and the two strategies could be compared
+
+Multiple lifts - Tests which might need writing:
+	When people make 'move' requests that are opposite direction to their initial 'call' request,
+		the lift will still honour their request once it has finished going in the other direction.
+	If one lift is already in flight and a new request comes in which is 
+		in the same direction 
+		and on the same route the lift is already moving in
+		and from a floor the lift has not yet passed
+		and no other lift is available which can get there more quickly
+		then the new request will be given to the lift already in flight
+		but actually...
+			you can ignore that big list of criteria
+			they will be used by the lift to calculate how quickly it can arrive at the caller's floor
+			but all the manager cares about is the answer to the question, "how quickly can you reach this caller?"
+		so in fact, the rule is just
+			when a new request comes in, it is given to the lift which can reach the caller first
+			this may or may not be a lift which is already in flight
+			see above for a whole load of ideas about not allocating the lift to the caller until a lift is passing the caller
+			but that would be such a big logic change that I reckon it should be implemented as an entirely separate strategy
+			and then the two can be compared
+
+Other tests which might need writing:
 If the lift runs out of upwards requests 
 	... and starts processing downwards requests...
 	... but the next downwards request is coming from a higher floor...
