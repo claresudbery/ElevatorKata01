@@ -76,9 +76,14 @@ namespace ElevatorKata01.Tests.Helpers
                                () => _theLiftManager.MakeDownwardsRequestFrom(floor));
         }
 
-        public void MakeUpwardsRequestFrom(int floor, bool shouldBeActedUponImmediately, string expectedLiftName)
+        public void MakeUpwardsRequestFrom(int floor, bool shouldBeActedUponImmediately, string expectedLiftName, bool liftWasPreviouslyIdle = false)
         {
             Lift(expectedLiftName).AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
+
+            if (liftWasPreviouslyIdle)
+            {
+                Lift(expectedLiftName).UpdateMillisecondsSinceTestStarted(_millisecondsSinceTestStarted);
+            }
 
             Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
                                () => _theLiftManager.MakeUpwardsRequestFrom(floor));

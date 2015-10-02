@@ -20,6 +20,7 @@ namespace ElevatorKata01.Tests.Helpers
         private int _numExpectedStatuses;
         private int _currentLiftFloor;
         private bool _testStarted = false;
+        private bool _anyExpectations = true;
 
         public string LiftName { get; private set; }
 
@@ -35,8 +36,11 @@ namespace ElevatorKata01.Tests.Helpers
 
         public void CheckExpectedStatuses()
         {
-            Assert.That(_liftStatuses.Count, Is.EqualTo(_numExpectedStatuses));
-            Assert.That(_expectedLiftStatuses.Count, Is.GreaterThan(0), "No expected events were marked for testing!");
+            if (_anyExpectations)
+            {
+                Assert.That(_liftStatuses.Count, Is.EqualTo(_numExpectedStatuses));
+                Assert.That(_expectedLiftStatuses.Count, Is.GreaterThan(0), "No expected events were marked for testing!");
+            }
 
             foreach (var expectedStatus in _expectedLiftStatuses)
             {
@@ -207,6 +211,16 @@ namespace ElevatorKata01.Tests.Helpers
             {
                 _theLift.Dispose();
             }
+        }
+
+        public void NoExpectations()
+        {
+            _anyExpectations = false;
+        }
+
+        public void UpdateMillisecondsSinceTestStarted(int millisecondsSinceTestStarted)
+        {
+            _timeTracker.MillisecondsSinceTestStarted = millisecondsSinceTestStarted;
         }
     }
 }
