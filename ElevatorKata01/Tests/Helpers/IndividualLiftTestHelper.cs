@@ -14,27 +14,14 @@ namespace ElevatorKata01.Tests.Helpers
         private readonly List<ExpectedLiftStatus> _expectedLiftStatuses = new List<ExpectedLiftStatus>();
 
         private readonly TestScheduler _testScheduler;
+        private TimeTracker _timeTracker;
         private ObservableLift _theLift;
-        private int _millisecondsSinceTestStarted;
-        private int MillisecondsSinceTestStarted
-        {
-            get { return _millisecondsSinceTestStarted; }
-            set
-            {
-                _millisecondsSinceTestStarted = value;
-                if (null != _liftManagerTestHelper)
-                {
-                    _liftManagerTestHelper.MillisecondsSinceTestStarted = _millisecondsSinceTestStarted;
-                }
-            }
-        }
         private int _millisecondsTakenByMostRecentEvent;
         private int _numExpectedStatuses;
         private int _currentLiftFloor;
         private bool _testStarted = false;
 
         public string LiftName { get; private set; }
-        private LiftManagerTestHelper _liftManagerTestHelper;
 
         public IndividualLiftTestHelper(
             string liftName, 
@@ -42,7 +29,7 @@ namespace ElevatorKata01.Tests.Helpers
             LiftManagerTestHelper liftManagerTestHelper = null)
         {
             LiftName = liftName;
-            _liftManagerTestHelper = liftManagerTestHelper;
+            _timeTracker = new TimeTracker(liftManagerTestHelper);
             _testScheduler = testScheduler;
         }
 
@@ -99,7 +86,7 @@ namespace ElevatorKata01.Tests.Helpers
             _expectedLiftStatuses.Add(new ExpectedLiftStatus
             {
                 StatusIndex = _numExpectedStatuses - 1,
-                SecondsSinceTestStarted = MillisecondsSinceTestStarted / 1000m,
+                SecondsSinceTestStarted = _timeTracker.MillisecondsSinceTestStarted / 1000m,
                 Status = new LiftStatus
                 {
                     CurrentDirection = direction,
@@ -112,14 +99,14 @@ namespace ElevatorKata01.Tests.Helpers
         {
             _testStarted = true;
 
-            MillisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
+            _timeTracker.MillisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
 
-            _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(MillisecondsSinceTestStarted).Ticks);
+            _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(_timeTracker.MillisecondsSinceTestStarted).Ticks);
         }
 
         public void StartTestForLiftManager()
         {
-            MillisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
+            _timeTracker.MillisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
         }
 
         public void MakeRequestToMoveTo(int floor, bool shouldBeActedUponImmediately)
@@ -128,7 +115,7 @@ namespace ElevatorKata01.Tests.Helpers
 
             Scheduler.Schedule(
                 _testScheduler,
-                TimeSpan.FromMilliseconds(MillisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
+                TimeSpan.FromMilliseconds(_timeTracker.MillisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
                 () => _theLift.MoveTo(floor));
         }
 
@@ -136,7 +123,7 @@ namespace ElevatorKata01.Tests.Helpers
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
-            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(MillisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
+            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_timeTracker.MillisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
                 () => _theLift.MakeDownwardsRequestFrom(floor));
         }
 
@@ -144,7 +131,7 @@ namespace ElevatorKata01.Tests.Helpers
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
-            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(MillisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
+            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_timeTracker.MillisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
                 () => _theLift.MakeUpwardsRequestFrom(floor));
         }
 
@@ -157,7 +144,8 @@ namespace ElevatorKata01.Tests.Helpers
 
         public IndividualLiftTestHelper ExpectToStopAt(int floor)
         {
-            MillisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
+            _timeTracker.MillisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
+
             _millisecondsTakenByMostRecentEvent = TimeConstants.WaitTime + TimeConstants.FloorInterval;
             _numExpectedStatuses++;
             _currentLiftFloor = floor;
@@ -171,7 +159,8 @@ namespace ElevatorKata01.Tests.Helpers
 
         public IndividualLiftTestHelper ExpectToVisit(int floor)
         {
-            MillisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
+            _timeTracker.MillisecondsSinceTestStarted += _millisecondsTakenByMostRecentEvent;
+
             _millisecondsTakenByMostRecentEvent = TimeConstants.FloorInterval;
             _numExpectedStatuses++;
             _currentLiftFloor = floor;
@@ -183,7 +172,8 @@ namespace ElevatorKata01.Tests.Helpers
             _liftStatuses.Clear();
             _expectedLiftStatuses.Clear();
 
-            MillisecondsSinceTestStarted = millisecondsSinceTestStarted;
+            _timeTracker.MillisecondsSinceTestStarted = millisecondsSinceTestStarted;
+
             _millisecondsTakenByMostRecentEvent = 0;
             _numExpectedStatuses = 0;
         }

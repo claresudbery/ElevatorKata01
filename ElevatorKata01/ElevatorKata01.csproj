@@ -103,6 +103,7 @@
     <Compile Include="Elements\Floors.cs" />
     <Compile Include="FunctionalCode\LiftManager.cs" />
     <Compile Include="Tests\Helpers\LiftManagerTestHelper.cs" />
+    <Compile Include="Tests\Helpers\TimeTracker.cs" />
     <Compile Include="Tests\Tests\MultipleLiftTests.cs" />
     <Compile Include="Tests\Tests\SingleLiftTests.cs" />
     <Compile Include="FunctionalCode\ObservableLift.cs" />

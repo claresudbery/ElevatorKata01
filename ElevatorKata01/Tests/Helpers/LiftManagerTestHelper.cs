@@ -15,14 +15,6 @@ namespace ElevatorKata01.Tests.Helpers
         private readonly TestScheduler _testScheduler = new TestScheduler();
         private LiftManager _theLiftManager;
         private int _millisecondsSinceTestStarted;
-        public int MillisecondsSinceTestStarted
-        {
-            get { return _millisecondsSinceTestStarted; }
-            set
-            {
-                _millisecondsSinceTestStarted = Math.Max(_millisecondsSinceTestStarted, value);
-            }
-        }
         private bool _testStarted = false;
 
         public void VerifyAllMarkers()
@@ -69,6 +61,11 @@ namespace ElevatorKata01.Tests.Helpers
             }
 
             _testScheduler.AdvanceBy(TimeSpan.FromMilliseconds(_millisecondsSinceTestStarted).Ticks);
+        }
+
+        public void AdjustMillisecondsSinceTestStarted(int possibleNewValue)
+        {
+            _millisecondsSinceTestStarted = Math.Max(_millisecondsSinceTestStarted, possibleNewValue);
         }
 
         public void MakeDownwardsRequestFrom(int floor, bool shouldBeActedUponImmediately, string expectedLiftName)
