@@ -112,14 +112,6 @@ namespace ElevatorKata01.FunctionalCode
 
         private void StartMoving(int nextFloor, Action<int> arrivedAtFloor)
         {
-                //// Starting value is 0 (first part of the for statement)
-                //0,
-                //// Keep going as long as i < 5 (second part of the for statement)
-                //i => i < 5,
-                //// How to get to the next iterator (third part of the for statement)
-                //i => i + 1,
-                //// On each iteration, execute the following statement (body of the for statement)
-                //i => i * i
             _liftEngineSubscription = Observable.Generate
                 (
                     // Starting value is this (first part of the for statement)
