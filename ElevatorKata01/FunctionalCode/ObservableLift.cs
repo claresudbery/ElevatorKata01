@@ -112,17 +112,36 @@ namespace ElevatorKata01.FunctionalCode
 
         private void StartMoving(int nextFloor, Action<int> arrivedAtFloor)
         {
+                //// Starting value is 0 (first part of the for statement)
+                //0,
+                //// Keep going as long as i < 5 (second part of the for statement)
+                //i => i < 5,
+                //// How to get to the next iterator (third part of the for statement)
+                //i => i + 1,
+                //// On each iteration, execute the following statement (body of the for statement)
+                //i => i * i
             _liftEngineSubscription = Observable.Generate
                 (
+                    // Starting value is this (first part of the for statement)
                     _currentFloor,
+
+                    // Keep going as long as this is true (second part of the for statement)
                     floor => _currentFloor < nextFloor
                         ? HaveWeArrivedAtHigherDestinationYet(floor, nextFloor)
                         : HaveWeArrivedAtLowerDestinationYet(floor, nextFloor),
+
+                    // This tells us how to get to the next iterator (third part of the for statement)
                     floor => _currentFloor < nextFloor
                         ? NextFloorUp(floor)
                         : NextFloorDown(floor), // iterator
+
+                    // On each iteration, output the following result (body of the for statement)
                     floor => floor, // actual value
+
+                    // Specify the iteration time between each result
                     floor => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
+
+                    // Specify which scheduler should be used to schedule events
                     _scheduler
                 )
                 .Subscribe
@@ -217,11 +236,22 @@ namespace ElevatorKata01.FunctionalCode
 
             _waitTimerSubscription = Observable.Generate
                 (
+                    // Starting value is this (first part of the for statement)
                     0,
+
+                    // Keep going as long as this is true (second part of the for statement)
                     i => i <= 1,
+
+                    // This tells us how to get to the next iterator (third part of the for statement)
                     i => i + 1, // iterator
+
+                    // On each iteration, output the following result (body of the for statement)
                     i => i, // actual value
+
+                    // Specify the iteration time between each result
                     i => TimeSpan.FromMilliseconds(TimeConstants.WaitTime),
+
+                    // Specify which scheduler should be used to schedule events
                     _scheduler
                 )
                 .Subscribe
