@@ -120,8 +120,7 @@ namespace ElevatorKata01.Tests.Helpers
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
-            Scheduler.Schedule(
-                _testScheduler,
+            _testScheduler.Schedule(
                 TimeSpan.FromMilliseconds(_timeTracker.MillisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
                 () => _theLift.MoveTo(floor));
         }
@@ -130,7 +129,8 @@ namespace ElevatorKata01.Tests.Helpers
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
-            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_timeTracker.MillisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
+            _testScheduler.Schedule(
+                TimeSpan.FromMilliseconds(_timeTracker.MillisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
                 () => _theLift.MakeDownwardsRequestFrom(floor));
         }
 
@@ -138,7 +138,8 @@ namespace ElevatorKata01.Tests.Helpers
         {
             AmendMostRecentEventTimeIfNecessary(shouldBeActedUponImmediately);
 
-            Scheduler.Schedule(_testScheduler, TimeSpan.FromMilliseconds(_timeTracker.MillisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
+            _testScheduler.Schedule(
+                TimeSpan.FromMilliseconds(_timeTracker.MillisecondsSinceTestStarted + TimeConstants.BetweenFloorsInterval),
                 () => _theLift.MakeUpwardsRequestFrom(floor));
         }
 
