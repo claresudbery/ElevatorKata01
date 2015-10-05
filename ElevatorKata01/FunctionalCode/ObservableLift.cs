@@ -125,10 +125,10 @@ namespace ElevatorKata01.FunctionalCode
                     // This tells us how to get to the next iterator (third part of the for statement)
                     floor => _currentFloor < nextFloor
                         ? NextFloorUp(floor)
-                        : NextFloorDown(floor), // iterator
+                        : NextFloorDown(floor), 
 
                     // On each iteration, output the following result (body of the for statement)
-                    floor => floor, // actual value
+                    floor => floor, 
 
                     // Specify the iteration time between each result
                     floor => TimeSpan.FromMilliseconds(TimeConstants.FloorInterval),
@@ -235,10 +235,10 @@ namespace ElevatorKata01.FunctionalCode
                     i => i <= 1,
 
                     // This tells us how to get to the next iterator (third part of the for statement)
-                    i => i + 1, // iterator
+                    i => i + 1, 
 
                     // On each iteration, output the following result (body of the for statement)
-                    i => i, // actual value
+                    i => i, 
 
                     // Specify the iteration time between each result
                     i => TimeSpan.FromMilliseconds(TimeConstants.WaitTime),
