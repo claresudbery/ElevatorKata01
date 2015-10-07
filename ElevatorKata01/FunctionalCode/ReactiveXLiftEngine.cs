@@ -6,7 +6,7 @@ using ElevatorKata01.Elements;
 
 namespace ElevatorKata01.FunctionalCode
 {
-    public class LiftEngine : IObservable<int>, IDisposable
+    public class ReactiveXLiftEngine : IObservable<int>, IDisposable, ILiftEngine
     {
         private readonly List<IObserver<int>> _observers = new List<IObserver<int>>();
         private readonly IScheduler _scheduler;
@@ -14,7 +14,7 @@ namespace ElevatorKata01.FunctionalCode
         private int _destinationFloor;
         private bool _moving = false;
 
-        public LiftEngine(IScheduler scheduler)
+        public ReactiveXLiftEngine(IScheduler scheduler)
         {
             _scheduler = scheduler;
         }

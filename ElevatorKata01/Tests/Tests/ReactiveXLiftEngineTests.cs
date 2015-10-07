@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace ElevatorKata01.Tests.Tests
 {
     [TestFixture]
-    public class LiftEngineTests : IObserver<int>
+    public class ReactiveXLiftEngineTests : IObserver<int>
     {
         private readonly List<int> _floorsVisited = new List<int>();
 
@@ -19,13 +19,13 @@ namespace ElevatorKata01.Tests.Tests
             // Arrange
             _floorsVisited.Clear();
             TestScheduler testScheduler = new TestScheduler();
-            LiftEngine liftEngine = new LiftEngine(testScheduler);
-            liftEngine.Subscribe(this);
-
+            ReactiveXLiftEngine reactiveXLiftEngine = new ReactiveXLiftEngine(testScheduler);
+            reactiveXLiftEngine.Subscribe(this);
+            
             // Act
             testScheduler.Schedule(
                 TimeSpan.FromMilliseconds(0),
-                () => liftEngine.Travel(1, 2));
+                () => reactiveXLiftEngine.Travel(1, 2));
             testScheduler.Start();
 
             // Assert
@@ -40,13 +40,13 @@ namespace ElevatorKata01.Tests.Tests
             // Arrange
             _floorsVisited.Clear();
             TestScheduler testScheduler = new TestScheduler();
-            LiftEngine liftEngine = new LiftEngine(testScheduler);
-            liftEngine.Subscribe(this);
+            ReactiveXLiftEngine reactiveXLiftEngine = new ReactiveXLiftEngine(testScheduler);
+            reactiveXLiftEngine.Subscribe(this);
 
             // Act
             testScheduler.Schedule(
                 TimeSpan.FromMilliseconds(0),
-                () => liftEngine.Travel(2, 1));
+                () => reactiveXLiftEngine.Travel(2, 1));
             testScheduler.Start();
 
             // Assert
@@ -61,13 +61,13 @@ namespace ElevatorKata01.Tests.Tests
             // Arrange
             _floorsVisited.Clear();
             TestScheduler testScheduler = new TestScheduler();
-            LiftEngine liftEngine = new LiftEngine(testScheduler);
-            liftEngine.Subscribe(this);
+            ReactiveXLiftEngine reactiveXLiftEngine = new ReactiveXLiftEngine(testScheduler);
+            reactiveXLiftEngine.Subscribe(this);
 
             // Act
             testScheduler.Schedule(
                 TimeSpan.FromMilliseconds(0),
-                () => liftEngine.Travel(7, 2));
+                () => reactiveXLiftEngine.Travel(7, 2));
             testScheduler.Start();
 
             // Assert
@@ -86,18 +86,18 @@ namespace ElevatorKata01.Tests.Tests
             // Arrange
             _floorsVisited.Clear();
             TestScheduler testScheduler = new TestScheduler();
-            LiftEngine liftEngine = new LiftEngine(testScheduler);
-            liftEngine.Subscribe(this);
+            ReactiveXLiftEngine reactiveXLiftEngine = new ReactiveXLiftEngine(testScheduler);
+            reactiveXLiftEngine.Subscribe(this);
 
             // Act
             testScheduler.Schedule(
                 TimeSpan.FromMilliseconds(0),
-                () => liftEngine.Travel(7, 2));
+                () => reactiveXLiftEngine.Travel(7, 2));
 
             testScheduler.Schedule(
                 // Note that in order for the lift to have time to visit three floors, we need to give it four floor intervals
                 TimeSpan.FromMilliseconds(TimeConstants.FloorInterval * 4),
-                () => liftEngine.Travel(3, 5));
+                () => reactiveXLiftEngine.Travel(3, 5));
 
             testScheduler.Start();
 
