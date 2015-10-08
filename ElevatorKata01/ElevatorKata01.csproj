@@ -102,19 +102,12 @@
     <Compile Include="Elements\ILiftMonitor.cs" />
     <Compile Include="Elements\LiftStatus.cs" />
     <Compile Include="Elements\Direction.cs" />
-    <Compile Include="FunctionalCode\ILiftEngine.cs" />
     <Compile Include="FunctionalCode\ILiftRequestHandler.cs" />
     <Compile Include="Elements\Floors.cs" />
-    <Compile Include="FunctionalCode\ITimer.cs" />
-    <Compile Include="FunctionalCode\ReactiveXLiftEngine.cs" />
     <Compile Include="FunctionalCode\LiftManager.cs" />
-    <Compile Include="FunctionalCode\SimpleTimerLiftEngine.cs" />
-    <Compile Include="FunctionalCode\TimerWrapper.cs" />
     <Compile Include="Tests\Helpers\LiftManagerTestHelper.cs" />
     <Compile Include="Tests\Helpers\TimeTracker.cs" />
-    <Compile Include="Tests\Tests\ReactiveXLiftEngineTests.cs" />
     <Compile Include="Tests\Tests\MultipleLiftTests.cs" />
-    <Compile Include="Tests\Tests\SimpleTimerLiftEngineTests.cs" />
     <Compile Include="Tests\Tests\SingleLiftTests.cs" />
     <Compile Include="FunctionalCode\ObservableLift.cs" />
     <Compile Include="FunctionalCode\Program.cs" />
@@ -122,7 +115,6 @@
     <Compile Include="Elements\TimeConstants.cs" />
     <Compile Include="Tests\Helpers\IndividualLiftTestHelper.cs" />
     <Compile Include="Tests\Helpers\ExpectedLiftStatus.cs" />
-    <Compile Include="Tests\Tests\XpManSampleTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -130,10 +122,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="FunctionalCode\SimpleTimerLiftEngine.html" />
-    <Content Include="FunctionalCode\SimpleTimerLiftEngine.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
