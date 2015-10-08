@@ -245,3 +245,44 @@ TO DO:
 QUS FOR XPMAN:
 	Are my tests actually acceptance tests? 
 		Should I have simpler unit tests which simply test the logic of individual lift methods?
+
+		
+Final comments for XPMan:
+
+What if the first downwards request (after all up requests) comes from higher up... 
+	but a new up event is inserted on the way to start the down requests?
+Ordering of events: using time?
+Algorithms: What kind of efficiency?
+Can the lift learn from its own mistakes?
+What about a front end?
+	An app?
+What about the way lifts work at LateRooms, where you know in advance where each passenger is going?
+	Doesn't make much difference with a single lift
+	Makes more difference when parcelling work out to multiple lifts?
+Multiple lifts: Should they be responsible for managing their own list of destinations?
+	Should requests be taken away from lifts and reassigned to other players in response to changed circumstances?
+		for instance, if several new requests are inserted between a lower floor and an upper floor?
+	Could wait until lifts are passing, and see who wants them	
+		but that would mean they would have to be already moving
+	Maybe the lifts are given specific jobs to do if they are lying idle, 
+		but once all lifts are in motion, no new jobs are assigned until a lift is about to pass or arrive at the floor in question.
+		Also, although the general rule is that new jobs are always given to idle lifts,
+			there may be times when lifts already in flight are closer than lifts still on the ground floor
+			so we can't just assume that all new requests are given to idle lifts
+			then again, we could just send the idle lift off in that direction anyway
+			in case the other one gets held up
+			and then just wait to see who gets there first
+			... in which case, we might have the situ where four requests come in from floors 20, 21, 22 and 23
+			and all four lifts are sent in the same direction
+			but in fact just one of those lifts is able to service all four requests
+			and in the meantime some other requests come in from much lower down
+			at which point some or all of those lifts should be diverted
+			so maybe each lift is never given a destination, just a direction
+			and then it is told when to stop on an ad hoc basis?
+				although if this approach is followed, then as soon as someone enters the lift and tells it where to go,
+				the lift will have to have a concrete destination
+				in which case should the lift itself be responsible for maintaining at least this subset of destinations
+				or will that info be maintained by the lift manager?	
+	Easier to start with current paradigm
+	Will then attempt the other approach
+	Hopefully with a strategy pattern?
