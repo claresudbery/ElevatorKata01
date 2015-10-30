@@ -1,4 +1,4 @@
-# ElevatorKata01
+﻿# ElevatorKata01
 elevator kata - first attempt (see http://blog.milesburton.com/2013/03/28/elevator-kata-mind-bending-pairing-exercise/)
 
 - An elevator responds to calls containing a source floor and direction
@@ -199,6 +199,8 @@ If somebody calls the lift while it is stopped on a floor, it will start moving 
 			If somebody calls the lift while it is stopped on a floor because somebody has just exited the lift, it will start moving again
 			
 Possible technologies for a UI: 
+	For hosting, try Digital Ocean - like AWS, but cheaper and suitable for small instances for personal projects
+	Nancy?
 	recommended by Braithers:
 		Ruby + Sinatra
 		Angular
@@ -252,6 +254,7 @@ Final comments for XPMan:
 What if the first downwards request (after all up requests) comes from higher up... 
 	but a new up event is inserted on the way to start the down requests?
 Ordering of events: using time?
+Rules: Maintain up requests and down requests in separate lists?
 Algorithms: What kind of efficiency?
 Can the lift learn from its own mistakes?
 What about a front end?
