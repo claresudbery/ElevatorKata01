@@ -147,3 +147,8 @@ Possible technologies for a UI:
 	recommended by Google:
 		Xamarin (based on my own quick Googling re what I could use to generate an app for Android and iOS, but using languages / technologies I already know (ie C# and Visual Studio))
 			Details here: http://nnish.com/2013/06/12/how-i-built-an-android-app-in-c-visual-studio-in-less-than-24hrs/
+			
+TO DO:
+	Front end
+	Use order instead of time	Multiple lifts
+	Finish implementing ReactiveX version of lift engine in XPManLiftKata (separate git repo)
